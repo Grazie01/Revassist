@@ -153,12 +153,12 @@ const setupAssociations = (models) => {
     //answer - review
     ReviewQuestion.hasMany(ReviewAnswers, {
         foreignKey: 'review_question_key',
-        as: 'answers'
+        as: 'review_answers'
     })
 
     ReviewAnswers.belongsTo(ReviewQuestion, {
         foreignKey: 'review_question_key',
-        as: 'questions'
+        as: 'review_questions'
     })
 
 

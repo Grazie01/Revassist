@@ -41,17 +41,19 @@ async function getReview(req, res) {
         include: [
           {
             model: ReviewQuestion,
-            as: "quesitons",
+            as: "questions",
             include: [
               {
                 model: ReviewAnswers,
-                as: "answers", // Ensure alias matches your associations
+                as: "review_answers", // Ensure alias matches your associations
                 attributes: ["confidence_level", "review_question_key"],
               },
             ],
           },
         ],
       });
+
+      console.log ("my review: ", review.dataValues)
   
       if (!review) {
         return res.status(404).json({ message: "review not found" });
