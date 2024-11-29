@@ -14,11 +14,6 @@ const StudentAssessment = sequelize.define('StudentAssessments', {
     allowNull: false,
     defaultValue: 0,
   },
-  current_score: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
   assessment_key: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -34,6 +29,20 @@ const StudentAssessment = sequelize.define('StudentAssessments', {
       model: Student,
       key: 'id',
     },
+  },
+  total_time_taken: {
+    type: DataTypes.TIME,
+    allowNull: false,
+    defaultValue: '00:00:00',
+  },
+  total_confidence_level: {
+    type: DataTypes.DOUBLE,
+    allowNull: true
+  },
+  review_level: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
   },
   createdAt: {
     type: DataTypes.DATE,

@@ -1,16 +1,16 @@
 const express = require('express');
-const { getAssessment, getAllAssessments, checkAnswer, getAllStudentAssessments, addStudentAssessment, getLatestStudentAssessmentId, resetCurrentScore, updateRecordedScore, getNextAvailableId } = require('../controllers/AssessmentController');
+const { getAssessment, getAllAssessments, getAllStudentAssessments, addStudentAssessment, getLatestStudentAssessmentId, updateRecordedScore, getNextAvailableId, setAssessmentAnswer, getAssessmentAnswers } = require('../controllers/AssessmentController');
 
 const assRouter = express.Router();
 
-assRouter.get('/get-next-available-id', getNextAvailableId)
+assRouter.get('/get-next-available-id', getNextAvailableId);
 assRouter.get('/', getAllAssessments);
-assRouter.get('/:topicId', getAssessment);
-assRouter.post('/check-answer', checkAnswer);
+assRouter.get('/:topicId/:studentId', getAssessment);
+assRouter.get('/get-answers/:assessmentId', getAssessmentAnswers);
 assRouter.post('/add-assessment-record', addStudentAssessment);
+assRouter.post('/update-score', updateRecordedScore);
 assRouter.get('/get-student-assessments/:studentId', getAllStudentAssessments);
 assRouter.get('/latest/:studentId/:moduleId', getLatestStudentAssessmentId);
-assRouter.post('/reset-score', resetCurrentScore);
-assRouter.post('/update-score', updateRecordedScore)
+assRouter.post('/send-answer', setAssessmentAnswer);
 
 module.exports = assRouter;

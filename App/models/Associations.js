@@ -1,5 +1,7 @@
+const { AssessmentAnswers } = require("./AssessmentAnswers");
 const { Correctdialoguereplies } = require("./correctdialoguereplies");
 const { Endingdialogue } = require("./endingdialogue");
+const { ReviewAnswers } = require("./ReviewAnswers");
 const { Simulation } = require("./Simulation");
 const { SimulationDialogue } = require("./Simulation_Dialogues");
 const { StudentSimulation } = require("./Student_Simulation");
@@ -146,6 +148,39 @@ const setupAssociations = (models) => {
     Simulation.hasOne(Endingdialogue, {
         foreignKey: 'scenario_key',
         as: 'ending_dialogue_key'
+    })
+
+    //answer - review
+    ReviewQuestion.hasMany(ReviewAnswers, {
+        foreignKey: 'review_question_key',
+        as: 'answers'
+    })
+
+    ReviewAnswers.belongsTo(ReviewQuestion, {
+        foreignKey: 'review_question_key',
+        as: 'questions'
+    })
+
+
+
+    //answer - assessment
+    StudentAssessment.hasMany(AssessmentAnswers, {
+        foreignKey: 'assessment_id_key',
+        as: 'answers'
+    })
+    AssessmentAnswers.belongsTo(StudentAssessment, {
+        foreignKey: 'assessment_id_key',
+        as: 'question'
+    })
+
+    AssessmentQuestion.hasMany(AssessmentAnswers, {
+                foreignKey: 'assessment_question_key',
+        as: 'assessment_answer'
+    })
+
+    AssessmentAnswers.belongsTo(AssessmentQuestion, {
+        foreignKey: 'assessment_question_key',
+        as: 'assessment_question'
     })
 };
 

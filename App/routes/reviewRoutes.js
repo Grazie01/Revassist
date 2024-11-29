@@ -1,9 +1,10 @@
 const express = require('express');
-const { getReviewQuestions, createReviewRecord, getStudentReview } = require('../controllers/ReviewController');
+const { getReviewQuestions, createStudentReview, setReviewAnswer, updateRecordedScore } = require('../controllers/ReviewController');
 const reviewRouter = express.Router();
 
-reviewRouter.get('/get-review-record/:studentId', getStudentReview)
 reviewRouter.get('/:lessonId/:studentId', getReviewQuestions);
-reviewRouter.post('/set-review-record', createReviewRecord);
+reviewRouter.post('/create-review-record', createStudentReview);
+reviewRouter.post('/set-review-answer', setReviewAnswer);
+reviewRouter.post('/update-score', updateRecordedScore);
 
 module.exports = reviewRouter;

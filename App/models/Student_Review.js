@@ -9,16 +9,6 @@ const StudentReview = sequelize.define('StudentReview', {
     autoIncrement: true,
     primaryKey: true,
   },
-  time_taken: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
-  number_of_questions: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
   review_level: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -39,7 +29,16 @@ const StudentReview = sequelize.define('StudentReview', {
         model: Student,
         key: 'id',
     },
-  }
+  },
+  total_time_taken: {
+    type: DataTypes.TIME,
+    allowNull: false,
+    defaultValue: '00:00:00',
+  },
+  total_confidence_level: {
+    type: DataTypes.DOUBLE,
+    allowNull: true
+  },
 });
 
 const createStudentReviewTable = async () => {

@@ -22,6 +22,8 @@ const { createSimulationDialogueTable } = require('./App/models/Simulation_Dialo
 const simRouter = require('./App/routes/simulationRoutes');
 const { createEndingdialogueTable } = require('./App/models/endingdialogue');
 const { createCorrectdialoguerepliesTable } = require('./App/models/correctdialoguereplies');
+const { createReviewAnswersTable } = require('./App/models/ReviewAnswers');
+const { createAssessmentAnswersTable } = require('./App/models/AssessmentAnswers');
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -40,7 +42,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cors(corsOptions));
 
-app.use(express.static("build"))
+//app.use(express.static("build"))
 
 app.get('/', (req, res) => {
     res.status(200).send("Welcome to the root URL of Server");
@@ -91,6 +93,8 @@ const startServer = async () => {
 
         await createCorrectdialoguerepliesTable();
         await createEndingdialogueTable();
+        await createReviewAnswersTable()
+        await createAssessmentAnswersTable();
 
         app.listen(PORT, (error) => {
             if (!error) {
