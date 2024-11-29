@@ -53,13 +53,13 @@ async function getReview(req, res) {
         ],
       });
   
-      if (!assessment) {
-        return res.status(404).json({ message: "Assessment not found" });
+      if (!review) {
+        return res.status(404).json({ message: "review not found" });
       }
   
-      let latestAssessment = await getLatestStudentAssessment(studentId, topicId);
-      level = latestAssessment.dataValues.review_level;
-      let questionsAmount = await countQuestionsInAssessment(topicId);
+      let latestReview = await getLatestStudentReview(studentId, reviewId);
+      level = latestReview.dataValues.review_level;
+      let questionsAmount = await countQuestionsInReview(reviewId);
       let partialQuestionAmount = getNumberOfQuestions(level, questionsAmount);
   
       // Prepare the array of questions to return
@@ -67,13 +67,13 @@ async function getReview(req, res) {
       const uniqueQuestions = new Set();  // Track unique question IDs
       let totalQuestionsAdded = 0; // Track total questions added (including repetitions)
   
-      // Iterate over the questions in the assessment
-      for (const question of assessment.assessment_questions) {
+      // Iterate over the questions in the review
+      for (const question of review.questions) {
         // Only proceed if we still have room for unique questions
         if (uniqueQuestions.size >= partialQuestionAmount) break;
   
         // Extract the confidence levels from related answers
-        const answers = question.assessment_answer || [];
+        const answers = question.review_answer || [];
         const latestAnswer = answers[answers.length - 1]; // Assuming latest answer determines confidence level
         const confidenceLevel = latestAnswer ? latestAnswer.confidence_level : null;
   
@@ -114,18 +114,18 @@ async function getReview(req, res) {
         if (totalQuestionsAdded >= partialQuestionAmount) break;
       }
   
-      // Return the assessment and formatted questions
+      // Return the review and formatted questions
       res.status(200).json({
-        assessment: {
-          id: assessment.id,
-          module_key: assessment.module_key,
+        review: {
+          id: review.id,
+          module_key: review.module_key,
         },
         questions: questionsToReturn,
       });
     } catch (error) {
-      console.error("Error fetching assessment:", error);
+      console.error("Error fetching review:", error);
       res.status(500).json({
-        error: "Getting assessment failed",
+        error: "Getting review failed",
         details: error.message,
       });
     }
@@ -453,5 +453,6 @@ module.exports = {
     getReviewQuestions,
     createStudentReview,
     setReviewAnswer,
-    updateRecordedScore
+    updateRecordedScore,
+    getReview
 };
