@@ -52,8 +52,6 @@ async function getReview(req, res) {
           },
         ],
       });
-
-      console.log ("my review: ", review.dataValues)
   
       if (!review) {
         return res.status(404).json({ message: "review not found" });
@@ -70,12 +68,12 @@ async function getReview(req, res) {
       let totalQuestionsAdded = 0; // Track total questions added (including repetitions)
   
       // Iterate over the questions in the review
-      for (const question of review.questions) {
+      for (const question of review.dataValues.questions) {
         // Only proceed if we still have room for unique questions
         if (uniqueQuestions.size >= partialQuestionAmount) break;
   
         // Extract the confidence levels from related answers
-        const answers = question.review_answer || [];
+        const answers = question.review_answers || [];
         const latestAnswer = answers[answers.length - 1]; // Assuming latest answer determines confidence level
         const confidenceLevel = latestAnswer ? latestAnswer.confidence_level : null;
   

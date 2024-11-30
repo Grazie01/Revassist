@@ -1,23 +1,23 @@
 // Utility function to convert TIME (HH:MM:SS) into total seconds
-export const timeToSeconds = (time) => {
+const timeToSeconds = (time) => {
     const [hours, minutes, seconds] = time.split(':').map(Number);
     return (hours * 3600) + (minutes * 60) + seconds;
 };
   
   // Utility function to convert total seconds back into HH:MM:SS format
-export const secondsToTime = (totalSeconds) => {
+const secondsToTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
   
-export function convertTimeToSeconds(time) {
+function convertTimeToSeconds(time) {
     const [hours, minutes, seconds] = time.split(':').map(Number);
     return hours * 3600 + minutes * 60 + seconds;
 }
   
-export function calculateConfidenceLevel(answerCards){
+function calculateConfidenceLevel(answerCards){
     const timeWeight = 0.3
     const scoreWeight = 0.7
     let total_confidence_level = 0;
@@ -52,7 +52,7 @@ export function calculateConfidenceLevel(answerCards){
     return ave_confidence_level;
 }
 
-export function calculateModelConfidenceLevel(answerCards, totalQuestionNum){
+function calculateModelConfidenceLevel(answerCards, totalQuestionNum){
     let ave_confidence_level = 0;
     console.log("totalQuestionNum: ", totalQuestionNum)
 
@@ -67,7 +67,7 @@ export function calculateModelConfidenceLevel(answerCards, totalQuestionNum){
 
 }
 
-export function getNumberOfQuestions (level, questionsAmount){
+function getNumberOfQuestions (level, questionsAmount){
     let partialQuestionAmount = 0;
     switch (level) {
         case 0:
@@ -86,3 +86,12 @@ export function getNumberOfQuestions (level, questionsAmount){
 
     return partialQuestionAmount;
 }
+
+module.exports = {
+    timeToSeconds,
+    secondsToTime,
+    convertTimeToSeconds,
+    calculateConfidenceLevel,
+    getNumberOfQuestions,
+    calculateModelConfidenceLevel
+};
