@@ -1,0 +1,46 @@
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../../config/dbconfig');
+const { StudentSimulation } = require('./Student_Simulation');
+
+const SimulationAnswers = sequelize.define('SimulationAnswers', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    student_simulation_key: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: StudentSimulation,
+            key: 'id',
+        },
+    },
+    question: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+    is_correct: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false, 
+    },
+    answer: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+});
+
+const createSimulationAnswersTable = async () => {
+  try {
+    await SimulationAnswers.sync();
+    console.log("SimulationAnswers table created or already exists.");
+  } catch (error) {
+    console.error("Error creating SimulationAnswers table:", error);
+  }
+};
+
+module.exports = {
+    SimulationAnswers,
+    createSimulationAnswersTable,
+};

@@ -35,9 +35,8 @@ async function getReview(req, res) {
     let level = 0;
   
     try {
-      // Fetch the review with associated questions and answers
       const review = await Review.findOne({
-        where: { id: reviewId }, // topicId corresponds to the review ID
+        where: { id: reviewId }, 
         include: [
           {
             model: ReviewQuestion,
@@ -45,7 +44,7 @@ async function getReview(req, res) {
             include: [
               {
                 model: ReviewAnswers,
-                as: "review_answers", // Ensure alias matches your associations
+                as: "review_answers", 
                 attributes: ["confidence_level", "review_question_key"],
               },
             ],
@@ -59,22 +58,19 @@ async function getReview(req, res) {
   
       let latestReview = await getLatestStudentReview(studentId, reviewId);
       level = latestReview.dataValues.review_level;
+      console.log("level: ", level)
       let questionsAmount = await countQuestionsInReview(reviewId);
       let partialQuestionAmount = getNumberOfQuestions(level, questionsAmount);
   
-      // Prepare the array of questions to return
       const questionsToReturn = [];
-      const uniqueQuestions = new Set();  // Track unique question IDs
-      let totalQuestionsAdded = 0; // Track total questions added (including repetitions)
+      const uniqueQuestions = new Set();
+      let totalQuestionsAdded = 0; 
   
-      // Iterate over the questions in the review
       for (const question of review.dataValues.questions) {
-        // Only proceed if we still have room for unique questions
         if (uniqueQuestions.size >= partialQuestionAmount) break;
   
-        // Extract the confidence levels from related answers
         const answers = question.review_answers || [];
-        const latestAnswer = answers[answers.length - 1]; // Assuming latest answer determines confidence level
+        const latestAnswer = answers[answers.length - 1]; 
         const confidenceLevel = latestAnswer ? latestAnswer.confidence_level : null;
   
         // Determine how many times this question should appear based on confidence level
@@ -87,34 +83,29 @@ async function getReview(req, res) {
           timesToAppear = 2; 
         }
   
-        // Add the question once (as a unique question) if it's not already added
         if (!uniqueQuestions.has(question.id)) {
           questionsToReturn.push({
             id: question.id,
-            question_text: question.query,  // Assuming `question_text` is `query`
+            question_text: question.query,  
             confidence_level: confidenceLevel,
           });
-          uniqueQuestions.add(question.id);  // Mark this question as added
-          totalQuestionsAdded++; // Increment the total number of questions added
+          uniqueQuestions.add(question.id); 
+          totalQuestionsAdded++; 
         }
   
-        // Repeat the question the appropriate number of times (only count towards repetitions)
-        for (let i = 1; i < timesToAppear; i++) { // Start from 1 because the first appearance is already added
+        for (let i = 1; i < timesToAppear; i++) { 
           questionsToReturn.push({
             id: question.id,
             question_text: question.query,
             confidence_level: confidenceLevel,
           });
   
-          // If we've reached the limit of total questions (including repetitions), stop
           if (totalQuestionsAdded >= partialQuestionAmount) break;
         }
   
-        // If we've reached the limit on total questions (including repetitions), stop
         if (totalQuestionsAdded >= partialQuestionAmount) break;
       }
   
-      // Return the review and formatted questions
       res.status(200).json({
         review: {
           id: review.id,
@@ -142,7 +133,7 @@ async function getLatestStudentReview(studentId, review_key) {
           student_key: studentId,
           review_key: review_key,
         },
-        order: [['createdAt', 'DESC']], // Order by the latest creation time
+        order: [['createdAt', 'DESC']],
       });
   
       if (!latestReview) {
@@ -187,21 +178,18 @@ async function setReviewAnswer(req, res) {
     console.log(`Received: studentReviewId=${studentReviewId}, questionId=${questionId}, timeTaken=${timeTaken}, answer=${answer}`);
   
     try {
-      // Validate input
       if (!studentReviewId || !questionId || !timeTaken || answer === undefined) {
         return res.status(400).json({
           error: "Review ID, Question ID, Time Taken, and Answer fields are required.",
         });
       }
   
-      // Validate correctness of the answer
       const isCorrect = await checkAnswer(questionId, answer);
       if (isCorrect === null) {
         return res.status(400).json({ error: "Error checking the answer. Please try again." });
       }
       console.log("is correct: ", isCorrect);
   
-      // Create a new answer record
       console.log("Creating new answer record...");
       const newAnswer = await ReviewAnswers.create({
         review_id_key: studentReviewId,
@@ -242,22 +230,18 @@ async function setReviewAnswer(req, res) {
   async function checkAnswer(questionId, userAns) {
     console.log ("questionid: ", questionId, "user answer: ",userAns)
     try {
-      // Fetch the question by ID
       const question = await ReviewQuestion.findOne({ where: { id: questionId } });
       console.log("question: ", question)
-      // Handle case where question is not found
       if (!question) {
         throw new Error("Question not found");
       }
   
-      // Check if the user's answer matches the correct answer
       const isCorrect = userAns === question.answer;
   
       return isCorrect;
     } catch (error) {
       console.error("Error checking answer:", error.message);
-      // Handle error appropriately (return false, or rethrow if needed)
-      return null; // Indicates an error occurred
+      return null; 
     }
   }
   
@@ -291,22 +275,6 @@ async function setReviewAnswer(req, res) {
         where: { student_key: studentId, id: studentReviewId },
       });
   
-      // If the record does not exist, create a new one
-      if (!studentReview) {
-        console.log("studentReview not found. Creating a new record.");
-  
-        studentReview= await StudentReview.create({
-          student_key: studentId,
-          review_key: studentReviewId,
-          recorded_score: 0,
-          total_time_taken: '00:00:00',
-          review_level: 0,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-      }
-  
-      // Calculate score and total time taken
       let score = await calculateScore(studentReviewId); 
       let totalTime = await calculateTotalTimeTaken(studentReviewId); 
       let formattedTotalTime = convertTimeToSeconds(totalTime);
@@ -326,15 +294,12 @@ async function setReviewAnswer(req, res) {
       if (confidence_level >= passingScore)
         studentReview.review_level = latestReview + 1;
   
-      // Update recorded score and total time taken
       studentReview.total_confidence_level = confidence_level;
       studentReview.recorded_score = score;
       studentReview.total_time_taken = totalTime;
   
-      // Save the updated or newly created record
       await studentReview.save();
   
-      // Respond with the updated score
       return res.status(200).json({ studentReview });
     } catch (error) {
       console.error("Error updating recorded score:", error);
@@ -344,11 +309,10 @@ async function setReviewAnswer(req, res) {
   
   async function calculateScore(studentReviewId) {
     try {
-      // Count the number of correct answers for the given review
       const correctAnswersCount = await ReviewAnswers.count({
         where: {
           review_id_key: studentReviewId,
-          is_correct: true, // Only count correct answers
+          is_correct: true, 
         },
       });
   
@@ -368,24 +332,21 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
         where: { review_id_key: studentReviewId },
       });
   
-      // If no answers found, return 0
       if (answers.length === 0) {
-        return '00:00:00'; // No time recorded
+        return '00:00:00'; 
       }
   
-      // Sum up all the time_taken values in seconds
       const totalTimeInSeconds = answers.reduce((total, answer) => {
-        const timeInSeconds = timeToSeconds(answer.time_taken); // Convert each time_taken to seconds
+        const timeInSeconds = timeToSeconds(answer.time_taken);
         return total + timeInSeconds;
       }, 0);
   
-      // Convert the total seconds back into HH:MM:SS format
       const totalTimeFormatted = secondsToTime(totalTimeInSeconds);
       return totalTimeFormatted;
   
     } catch (error) {
       console.error("Error calculating total time taken:", error);
-      return '00:00:00'; // Return 0 if error occurs
+      return '00:00:00';
     }
   };
 
@@ -412,20 +373,18 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
         return 'studentReviewId is required.';
       }
   
-      // Fetch the latest answer for each review question
       const answers = await ReviewAnswers.findAll({
         where: {
           review_id_key: studentReviewId,
         },
         attributes: ['id', 'review_question_key', 'is_correct', 'time_taken', 'confidence_level'],
-        order: [['createdAt', 'DESC']], // Sort by createdAt in descending order
+        order: [['createdAt', 'DESC']], 
       });
   
       if (!answers || answers.length === 0) {
         return 'No answers found for the given review.';
       }
   
-      // To ensure we only return the latest answer for each question
       const latestAnswers = [];
       const seenQuestions = new Set();
   
@@ -436,7 +395,6 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
         }
       }
   
-      // Log only the confidence level of the latest answers
       latestAnswers.forEach((answer) => {
         console.log(`Confidence Level for Question ID ${answer.review_question_key}: ${answer.confidence_level}`);
       });
@@ -448,11 +406,177 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
     }
   }
 
+  async function getLatestStudentReviewAPI(req, res) {
+    const { lessonId, studentId } = req.params;
+  
+    try {
+      if (!studentId || !lessonId) {
+        return res.status(400).json({
+          error: "studentId and lessonId are required.",
+        });
+      }
+  
+      const latestReview = await StudentReview.findOne({
+        where: {
+          student_key: studentId,
+          review_key: lessonId,
+        },
+        order: [["createdAt", "DESC"]], 
+      });
+  
+      if (!latestReview) {
+        return res.status(404).json({
+          error: "No review record found for this student and topic.",
+        });
+      }
+  
+      return res.status(200).json(latestReview);
+    } catch (error) {
+      console.error("Error fetching the latest student review:", error);
+      return res.status(500).json({
+        error: "An error occurred while fetching the latest review record.",
+      });
+    }
+  }
+
+  async function getReviewRecords(req, res) {
+    const { studentId } = req.params;
+  
+    try {
+      // Validate studentId
+      if (!studentId) {
+        return res.status(400).json({
+          error: "Student ID is required.",
+        });
+      }
+  
+      // Fetch the review records with associated answers and lesson details
+      const reviewRecords = await StudentReview.findAll({
+        where: {
+          student_key: studentId,
+        },
+        include: [
+          {
+            model: Review,
+            as: 'review', // Ensure alias matches the association in the Review model
+            include: [
+              {
+                model: Lesson,
+                as: 'lesson', // Include lesson information
+                attributes: ['title'], // Only include the lesson title
+              },
+            ],
+          },
+        ],
+      });
+  
+      // Check if any records were found
+      if (!reviewRecords || reviewRecords.length === 0) {
+        return res.status(404).json({
+          error: "No review records found for this student.",
+        });
+      }
+  
+      // Return the review records along with lesson title
+      return res.status(200).json({
+        message: "Review records retrieved successfully.",
+        data: reviewRecords.map(record => ({
+          ...record.toJSON(),
+          lessonTitle: record.review.lesson.title, // Add lesson title to the result
+        })),
+      });
+    } catch (error) {
+      console.error("Error fetching student review records:", error.message);
+      return res.status(500).json({
+        error: "An error occurred while fetching review records.",
+        details: error.message,
+      });
+    }
+  }
+
+  async function getReviewRecord(req, res) {
+    const { studentReviewId } = req.params;
+  
+    try {
+      // Validate that studentReviewId is provided
+      if (!studentReviewId) {
+        return res.status(400).json({ error: "studentReviewId is required." });
+      }
+  
+      // Fetch the StudentReview record with associated Review, Questions, and filtered Answers
+      const studentReview = await StudentReview.findOne({
+        where: { id: studentReviewId },  // Find the StudentReview by its ID
+        include: [
+          {
+            model: Review, 
+            as: 'review',  
+            include: [
+              {
+                model: ReviewQuestion,  // Fetch the associated ReviewQuestions
+                as: 'questions', // Alias for the questions in Review
+              }
+            ]
+          },
+          {
+            model: ReviewAnswers, 
+            as: 'answers', 
+            where: { review_id_key: studentReviewId }, 
+            required: false  
+          }
+        ]
+      });
+  
+      // Check if the StudentReview record exists
+      if (!studentReview) {
+        return res.status(404).json({ message: "Student review not found." });
+      }
+  
+      // Prepare the data to return, including questions and answers grouped together
+      const reviewData = {
+        reviewId: studentReview.id,
+        studentId: studentReview.student_key,  
+        createdAt: studentReview.createdAt,
+        questionsAndAnswers: studentReview.review.questions.map((question) => {
+          // Filter the answers that belong to this specific question
+          const answersForQuestion = studentReview.answers.filter(answer => answer.review_question_key === question.id);  
+          
+          // Map answers and include 'isCorrect' and 'answer' field
+          const answers = answersForQuestion.map(answer => ({
+            answer: answer.answer,
+            isCorrect: answer.is_correct,
+          }));
+  
+          // Return the question along with its answers (including the correct answer)
+          return {
+            question: question.query,  
+            answers: answers,         
+            correct_answer: question.answer,  // Correct answer for the question
+          };
+        }).filter(q => q.answers.length > 0),  // Filter out questions without answers
+      };
+  
+      // Return the grouped questions and answers data
+      res.status(200).json(reviewData);
+  
+    } catch (error) {
+      console.error("Error getting review record:", error);
+      res.status(500).json({
+        error: "Failed to fetch review record.",
+        details: error.message,
+      });
+    }
+  }
+  
+  
+  
 
 module.exports = {
     getReviewQuestions,
     createStudentReview,
     setReviewAnswer,
     updateRecordedScore,
-    getReview
+    getReview,
+    getLatestStudentReviewAPI,
+    getReviewRecords,
+    getReviewRecord
 };

@@ -38,6 +38,7 @@ const AssessmentAnswers = sequelize.define('AssessmentAnswers', {
     answer: {
         type: DataTypes.TEXT,
         allowNull: false,
+        defaultValue: "answer"
     },
     confidence_level: {
         type: DataTypes.DOUBLE,

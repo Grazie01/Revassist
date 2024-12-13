@@ -1,9 +1,6 @@
 const { AssessmentAnswers } = require("./AssessmentAnswers");
-const { Correctdialoguereplies } = require("./correctdialoguereplies");
-const { Endingdialogue } = require("./endingdialogue");
 const { ReviewAnswers } = require("./ReviewAnswers");
-const { Simulation } = require("./Simulation");
-const { SimulationDialogue } = require("./Simulation_Dialogues");
+const { SimulationAnswers } = require("./SimulationAnswers");
 const { StudentSimulation } = require("./Student_Simulation");
 
 // associations.js
@@ -109,47 +106,6 @@ const setupAssociations = (models) => {
         as: 'student_simulation',
     });
 
-    // Simulation - StudentSimulation - SimulationDialogues
-    Simulation.hasMany(StudentSimulation, {
-        foreignKey: 'simulation_key',
-        as: 'student_simulations',
-    });
-
-    Simulation.hasMany(SimulationDialogue, {
-        foreignKey: 'simulation_key',
-        as: 'simulations_dialogues',
-    });
-
-    StudentSimulation.belongsTo(Simulation, {
-        foreignKey: 'simulation_key',
-        as: 'simulation',
-    });
-
-    SimulationDialogue.belongsTo(Simulation, {
-        foreignKey: 'simulation_key',
-        as: 'simulation',
-    })
-
-    Correctdialoguereplies.belongsTo(SimulationDialogue, {
-        foreignKey: 'simulation_dialogues_key',
-        as: 'simulation_dialogues'
-    })
-
-    SimulationDialogue.hasOne(Correctdialoguereplies, {
-        foreignKey: 'simulation_dialogues_key',
-        as: 'correctdialogue_key'
-    })
-
-    Endingdialogue.belongsTo(Simulation, {
-        foreignKey: 'scenario_key',
-        as: 'simulation'
-    })
-
-    Simulation.hasOne(Endingdialogue, {
-        foreignKey: 'scenario_key',
-        as: 'ending_dialogue_key'
-    })
-
     //answer - review
     ReviewQuestion.hasMany(ReviewAnswers, {
         foreignKey: 'review_question_key',
@@ -159,6 +115,11 @@ const setupAssociations = (models) => {
     ReviewAnswers.belongsTo(ReviewQuestion, {
         foreignKey: 'review_question_key',
         as: 'review_questions'
+    })
+
+    StudentReview.hasMany(ReviewAnswers, {
+        foreignKey: 'review_id_key',
+        as: 'answers'
     })
 
 
@@ -174,13 +135,24 @@ const setupAssociations = (models) => {
     })
 
     AssessmentQuestion.hasMany(AssessmentAnswers, {
-                foreignKey: 'assessment_question_key',
+        foreignKey: 'assessment_question_key',
         as: 'assessment_answer'
     })
 
     AssessmentAnswers.belongsTo(AssessmentQuestion, {
         foreignKey: 'assessment_question_key',
         as: 'assessment_question'
+    })
+
+    //simulation
+    StudentSimulation.hasMany(SimulationAnswers, {
+        foreignKey: 'student_simulation_key',
+        as: 'simulation_answers'
+    })
+
+    SimulationAnswers.belongsTo(StudentSimulation, {
+        foreignKey: 'student_simulation_key',
+        as: 'simulation_record'
     })
 };
 

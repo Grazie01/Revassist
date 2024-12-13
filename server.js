@@ -16,14 +16,11 @@ const setupAssociations = require('./App/models/Associations');
 const lessonRouter = require('./App/routes/lessonRoutes');
 const reviewRouter = require('./App/routes/reviewRoutes');
 const assRouter = require('./App/routes/assessmentRoutes');
-const { createSimulationsTable } = require('./App/models/Simulation');
 const { createStudentSimulationTable } = require('./App/models/Student_Simulation');
-const { createSimulationDialogueTable } = require('./App/models/Simulation_Dialogues');
 const simRouter = require('./App/routes/simulationRoutes');
-const { createEndingdialogueTable } = require('./App/models/endingdialogue');
-const { createCorrectdialoguerepliesTable } = require('./App/models/correctdialoguereplies');
 const { createReviewAnswersTable } = require('./App/models/ReviewAnswers');
 const { createAssessmentAnswersTable } = require('./App/models/AssessmentAnswers');
+const { createSimulationAnswersTable } = require('./App/models/SimulationAnswers');
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -87,15 +84,12 @@ const startServer = async () => {
         await createStudentAssessmentsTable();
         await createStudentReviewTable();
 
-        await createSimulationsTable();
         await createStudentSimulationTable();
-        await createSimulationDialogueTable();
+        await createSimulationAnswersTable();
 
-        await createCorrectdialoguerepliesTable();
-        await createEndingdialogueTable();
         await createReviewAnswersTable()
         await createAssessmentAnswersTable();
-
+        
         app.listen(PORT, (error) => {
             if (!error) {
                 console.log(`Server is successfully running, and app is listening on port ${PORT}`);

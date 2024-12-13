@@ -1,76 +1,26 @@
-const { Correctdialoguereplies } = require("../models/correctdialoguereplies");
-const { Endingdialogue } = require("../models/endingdialogue");
-const { Simulation } = require("../models/Simulation");
-const { SimulationDialogue } = require("../models/Simulation_Dialogues");
+const { SimulationAnswers } = require("../models/SimulationAnswers");
 const { Student } = require("../models/Student");
 const { StudentSimulation } = require("../models/Student_Simulation");
 
 
-async function getSimulations(req, res) { 
-    try {
-        const simulations = await Simulation.findAll({
-            include: [
-                {
-                    model: SimulationDialogue, 
-                    as: 'simulations_dialogues',
-                },
-            ],
-        });
-
-        if (!simulations) {
-            return res.status(404).json({ error: 'simulations not found' });
-        }
-
-        res.json({ simulations });
-    } catch (error) {
-        res.status(500).json({ 
-            error: 'Getting simulations failed', 
-            details: error.message 
-        });
-    }
-}
-
-async function getScenarioQuestions(req, res) { 
-    const { simulationId } = req.params;
-    try {
-        const simulation = await SimulationDialogue.findAll({
-            where: {
-                simulation_key: simulationId
-            }
-        });
-
-        if (!simulation) {
-            return res.status(404).json({ error: 'simulation scenario not found' });
-        }
-
-        res.json({ simulation });
-    } catch (error) {
-        res.status(500).json({ 
-            error: 'Getting simulation scenario failed', 
-            details: error.message 
-        });
-    }
-}
-
 async function setSimRecord(req, res) {
-    const { simulationId, studentId } = req.body;
+    const { studentId, score, title } = req.body;
 
     try {
-        if (!simulationId || !studentId) {
-            return res.status(400).json({ error: 'Simulation ID and Student ID are required.' });
+        if (!studentId) {
+            return res.status(400).json({ error: 'Student ID are required.' });
         }
 
-        const simulationExists = await Simulation.findByPk(simulationId);
         const studentExists = await Student.findByPk(studentId);
 
-        if (!simulationExists || !studentExists) {
-            return res.status(404).json({ error: 'Simulation or Student not found.' });
+        if (!studentExists) {
+            return res.status(404).json({ error: 'Student not found.' });
         }
 
         const studentSimulation = await StudentSimulation.create({
-            simulation_key: simulationId,
             student_key: studentId,
-            score: 100,
+            score: score,
+            title: title
         });
 
         res.status(201).json({
@@ -87,210 +37,114 @@ async function setSimRecord(req, res) {
     }
 }
 
-async function updateSimRecord(req, res) {
-    const { simulationId, studentId, score, simrecordId } = req.body;
+async function getStudentSimulations(req, res) {
+    const { studentId } = req.params;
+    try {
+      const simulations = await StudentSimulation.findAll({
+        where: {
+          student_key: studentId,
+        },
+      });
+  
+      const groupedByTitle = simulations.reduce((acc, simulation) => {
+        const title = simulation.title; 
+
+        if (!acc[title]) {
+          acc[title] = [];
+        }
+
+        acc[title].push(simulation);
+  
+        return acc;
+      }, {});
+  
+      res.status(200).json(groupedByTitle);
+    } catch (error) {
+      res.status(500).json({
+        error: "Getting simulation records failed",
+        details: error.message,
+      });
+    }
+  }
+  
+
+
+//========================= Answers ===========================//
+
+async function setSimAnswer(req, res) {
+    const { simulationKey, isCorrect, answer, question } = req.body;
 
     try {
-        if (!simulationId || !studentId) {
-            return res.status(400).json({ error: 'Simulation ID and Student ID are required.' });
+        if (simulationKey === undefined || isCorrect === undefined || answer === undefined) {
+            console.log(simulationKey, isCorrect, answer, question);
+            return res.status(400).json({ error: 'simulationKey, isCorrect, and answer are required.' });
+        }
+        
+
+        const simulation = await StudentSimulation.findByPk(simulationKey);
+
+        if (!simulation) {
+            return res.status(404).json({ error: 'Simulation record not found.' });
         }
 
-        const studentSimulation = await StudentSimulation.findOne({
-            where: {
-                simulation_key: simulationId,
-                student_key: studentId,
-                id: simrecordId
-            },
+        const studentAnswer = await SimulationAnswers.create({
+            student_simulation_key: simulationKey,
+            is_correct: isCorrect,
+            answer: answer,
+            question: question
         });
 
-        if (!studentSimulation) {
-            return res.status(404).json({ error: 'Student simulation record not found.' });
-        }
-
-        studentSimulation.score = score || studentSimulation.score;
-        studentSimulation.submitted = 1;
-        await studentSimulation.save(); 
-
-        res.status(200).json({
-            message: 'Student simulation record updated successfully.',
-            studentSimulation,
+        res.status(201).json({
+            message: 'Student simulation answer created.',
+            studentAnswer,
         });
+
     } catch (error) {
-        console.error('Error updating student simulation record:', error);
+        console.error('Error creating student simulation answer:', error);
         res.status(500).json({
-            error: 'Updating simulation record failed',
+            error: 'Setting simulation answer failed',
             details: error.message,
         });
     }
 }
 
-
-async function getStudentSimulation(req, res) {
-    const { studentId } = req.params;
+async function getSimulationAnswers(req, res) {
+    const { recordId } = req.params;
 
     try {
-        const simulations = await StudentSimulation.findAll({
-            where: { student_key: studentId, submitted: 1},
+        if (!recordId) {
+            return res.status(400).json({ error: 'recordId is required.' });
+        }
+
+        const simulationRecord = await StudentSimulation.findOne({
+            where: {
+                id: recordId,
+            },
             include: [
                 {
-                    model: Simulation,
-                    as: 'simulation',
-                    attributes: ['id', 'title'],
-                    include: [
-                        {
-                            model: SimulationDialogue,
-                            as: 'simulations_dialogues',
-                        },
-                    ],
+                    model: SimulationAnswers,
+                    as: 'simulation_answers', 
                 },
             ],
         });
 
-        if (simulations.length === 0) {
-            return res.status(404).json({
-                message: 'No simulation records found for this student.',
-            });
+        if (!simulationRecord) {
+            return res.status(404).json({ error: 'Simulation record not found.' });
         }
+        
+        const questionsAndAnswers = simulationRecord.simulation_answers.map((answer) => ({
+            question: answer.question,
+            answers: [{
+                answer: answer.answer,
+                isCorrect: answer.is_correct
+            }]
+        }));
 
-        const simulationsResults = [];
-
-        for (const simulation of simulations) {
-            const score = simulation.score || 0;
-            const simulationKey = simulation.simulation_key || simulation.simulation.id;
-
-            const totalDialogues = await SimulationDialogue.count({
-                where: { simulation_key: simulationKey },
-            });
-
-            const averageScore = (totalDialogues > 0 ? score / totalDialogues : 0) * 100;
-            const formattedAverageScore = Number(averageScore.toFixed(2));
-
-            simulationsResults.push({
-                ...simulation.toJSON(),
-                averageScore: formattedAverageScore,
-            });
-        }
-
-        res.status(200).json({
-            message: 'Simulation records found',
-            simulations: simulationsResults,
-        });
+        res.status(200).json({ questionsAndAnswers });
     } catch (error) {
+        console.error('Error fetching student simulation record and answers:', error);
         res.status(500).json({
-            error: 'Fetching simulation records failed',
-            details: error.message,
-        });
-    }
-}
-
-async function getLatestId(req, res) {
-    const { studentId, simulationId } = req.params;
-
-    try {
-        // Find the latest unsubmitted simulation record
-        let latestRecord = await StudentSimulation.findOne({
-            where: {
-                student_key: studentId,
-                simulation_key: simulationId,
-                submitted: 0,
-            },
-            order: [['createdAt', 'DESC']],
-        });
-
-        if (!latestRecord) {
-            latestRecord = await StudentSimulation.create({
-                student_key: studentId,
-                simulation_key: simulationId,
-                score: 100,
-                submitted: 0,
-            });
-
-            console.log("New record created:", latestRecord);
-        } else {
-            console.log("Latest record found:", latestRecord);
-        }
-
-        res.status(200).json({
-            latestSimulationId: latestRecord.id,
-        });
-    } catch (error) {
-        console.error('Error retrieving or creating simulation record:', error);
-        res.status(500).json({
-            error: 'Failed to retrieve or create the latest simulation record',
-            details: error.message,
-        });
-    }
-}
-
-
-
-async function getSpecificSimRecord(req, res){
-    const { studentId, simulationrecordId } = req.params;
-
-    try {
-        const record = await StudentSimulation.findOne({
-            where: {
-                student_key: studentId,
-                id: simulationrecordId,
-            },
-            order: [['createdAt', 'DESC']],
-        });
-
-
-        res.status(200).json({
-            record: record,
-        });
-    } catch (error) {
-        console.error('Error retrieving simulation record:', error);
-        res.status(500).json({
-            error: 'Failed to retrieve the simulation record',
-            details: error.message,
-        });
-    }
-}
-
-async function getEndingDialogue(req, res){
-    const { scenario_key } = req.params;
-    console.log(scenario_key)
-
-    try {
-        const dialogue = await Endingdialogue.findOne({
-            where: { scenario_key: scenario_key },
-          });
-          
-        console.log(dialogue)
-
-        res.status(200).json({
-            dialogue: dialogue,
-        });
-    } catch (error) {
-        console.error('Error retrieving dialogue:', error);
-        res.status(500).json({
-            error: 'Failed to retrieve the dialogue',
-            details: error.message,
-        });
-    }
-}
-
-async function getCorrectDialogue(req, res){
-    const { simulationDialogueId } = req.params;
-
-    try {
-        const dialogue = await Correctdialoguereplies.findOne({
-            where: {
-                simulation_dialogues_key: simulationDialogueId,
-            },
-            order: [['createdAt', 'DESC']],
-        });
-
-
-        res.status(200).json({
-            dialogue: dialogue,
-        });
-    } catch (error) {
-        console.error('Error retrieving dialogue:', error);
-        res.status(500).json({
-            error: 'Failed to retrieve the dialogue',
+            error: 'Fetching simulation record and answers failed.',
             details: error.message,
         });
     }
@@ -298,13 +152,8 @@ async function getCorrectDialogue(req, res){
 
 
 module.exports = { 
-    getSimulations,
-    getScenarioQuestions,
     setSimRecord,
-    getStudentSimulation,
-    getLatestId,
-    getSpecificSimRecord,
-    updateSimRecord,
-    getCorrectDialogue,
-    getEndingDialogue
+    setSimAnswer,
+    getStudentSimulations,
+    getSimulationAnswers
 };
