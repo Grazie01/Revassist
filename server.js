@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cors(corsOptions));
 
-//app.use(express.static("build"))
+app.use(express.static("build"))
 
 app.get('/', (req, res) => {
     res.status(200).send("Welcome to the root URL of Server");
