@@ -1,60 +1,62 @@
 const { Sequelize } = require('sequelize');
 const config = require('./sequelizeconfig');
 
-const env = process.env.NODE_ENV || 'development'; // Default to development
-const dbConfig = config[env];
+const env = process.env.NODE_ENV || 'development';
+console.log('Environment:', env);
 
-// Create an instance of Sequelize with the database information
+const dbConfig = config[env];
+console.log('Loaded DB Config:', dbConfig);
+
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
-    host: dbConfig.host,
-    dialect: dbConfig.dialect,
-    logging: false,
+  host: dbConfig.host.trim(),
+  dialect: dbConfig.dialect,
+  logging: false,
 });
 
-// Function to create the database if it does not exist
 const createDatabaseIfNotExists = async () => {
+  const adminConfig = {
+      username: dbConfig.username,
+      password: dbConfig.password,
+      host: dbConfig.host,
+      dialect: dbConfig.dialect,
+  };
+
   const tempConnection = new Sequelize(
-    'mysql://root:@localhost:3306', // Connect without specifying the database
-    {
-      logging: false,
-      dialect: 'mysql',
-      dialectOptions: {
-        connectTimeout: 1000,
-      },
-    }
+      `mysql://${adminConfig.username}:${adminConfig.password}@${adminConfig.host}:3306`,
+      {
+          logging: false,
+          dialect: adminConfig.dialect,
+          dialectOptions: {
+              connectTimeout: 1000,
+          },
+      }
   );
 
   try {
-    // Test the connection
-    await tempConnection.authenticate();
-    console.log('Connection to MySQL server has been established successfully.');
+      console.log('Testing temporary connection...');
+      await tempConnection.authenticate();
+      console.log('Temporary connection established successfully.');
 
-    // Create the database if it does not exist
-    await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
-    console.log(`Database '${dbConfig.database}' has been created or already exists.`);
-    
+      console.log(`Creating database '${dbConfig.database}' if it does not exist...`);
+      await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
+      console.log(`Database '${dbConfig.database}' has been created or already exists.`);
   } catch (error) {
-    console.error('Unable to connect to the MySQL server:', error);
+      console.error('Error in createDatabaseIfNotExists:', error.message);
+      throw new Error(`Failed to ensure database existence: ${error.message}`);
   } finally {
-    // Close the temporary connection
-    await tempConnection.close();
+      await tempConnection.close();
   }
 };
 
-// Initialize the database
-const initializeDatabase = async () => {
-  await createDatabaseIfNotExists();
-  
+
+(async () => {
   try {
-    await sequelize.authenticate();
-    console.log('Authenticated with the database successfully.');
+    await createDatabaseIfNotExists();
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Failed to ensure database existence:', error.message);
+    process.exit(1);
   }
-};
+})();
 
-// Export sequelize instance and initialization function
-module.exports = {
-  sequelize,
-  initializeDatabase,
-};
+console.log('Exporting Sequelize instance.');
+module.exports = sequelize;
