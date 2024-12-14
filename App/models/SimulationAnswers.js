@@ -1,14 +1,14 @@
 const path = require('path');
-console.log('Resolved dbconfig Path:', path.resolve('../../config/dbconfig'));
-console.log('Resolved StudentSimulation Path:', path.resolve('./Student_Simulation'));
+console.log('Resolved dbconfig Path:', path.resolve(__dirname, './config/dbconfig'));
+console.log('Resolved StudentSimulation Path:', path.resolve(__dirname, './App/models/Student_Simulation'));
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../config/dbconfig'); 
+const sequelize = require(__dirname, './config/dbconfig'); 
 
 if (!sequelize) {
   throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
 }
-const { StudentSimulation } = require(path.resolve('./App/models/Student_Simulation'));
+const { StudentSimulation } = require(path.resolve(__dirname, './App/models/Student_Simulation'));
 
 const SimulationAnswers = sequelize.define('SimulationAnswers', {
     id: {

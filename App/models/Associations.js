@@ -1,8 +1,8 @@
 const path = require('path');
-const { AssessmentAnswers } = require(path.resolve('./App/models/AssessmentAnswers'));
-const { ReviewAnswers } = require(path.resolve('./App/models/ReviewAnswers'));
-const { SimulationAnswers } = require(path.resolve('./App/models/SimulationAnswers'));
-const { StudentSimulation } = require(path.resolve('./App/models/Student_Simulation'));
+const { AssessmentAnswers } = require(path.resolve(__dirname, './App/models/AssessmentAnswers'));
+const { ReviewAnswers } = require(path.resolve(__dirname, './App/models/ReviewAnswers'));
+const { SimulationAnswers } = require(path.resolve(__dirname, './App/models/SimulationAnswers'));
+const { StudentSimulation } = require(path.resolve(__dirname, './App/models/Student_Simulation'));
 
 // associations.js
 const setupAssociations = (models) => {

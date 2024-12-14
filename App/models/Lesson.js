@@ -1,17 +1,17 @@
 const path = require('path');
 console.log("path is: ", path)
-console.log('Resolved dbconfig Path:', path.resolve('./config/dbconfig'));
-console.log('Resolved Topic Model Path:', path.resolve('./App/models/Topic.js'));
+console.log('Resolved dbconfig Path:', path.resolve(__dirname, './config/dbconfig'));
+console.log('Resolved Topic Model Path:', path.resolve(__dirname, './App/models/Topic.js'));
 
 const { DataTypes } = require('sequelize');
-const sequelize = require(path.resolve('./config/dbconfig')); 
+const sequelize = require(path.resolve(__dirname, './config/dbconfig')); 
 
 if (!sequelize) {
   throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
 }
 
 
-const { Topic } = require(path.resolve('./App/models/Topic.js'));
+const { Topic } = require(path.resolve(__dirname, './App/models/Topic.js'));
 
 const Lesson = sequelize.define('Lessons', {  
   id: {
