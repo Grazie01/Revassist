@@ -22,7 +22,7 @@ const reviewRouter = require(path.resolve(__dirname, './App/routes/reviewRoutes'
 const assRouter = require(path.resolve(__dirname, './App/routes/assessmentRoutes'));
 const simRouter = require(path.resolve(__dirname, './App/routes/simulationRoutes'));
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 const app = express();
 
 var corsOptions = {
