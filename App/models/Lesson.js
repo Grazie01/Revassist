@@ -1,7 +1,6 @@
 const path = require('path');
+console.log("path is: ", path)
 console.log('Resolved dbconfig Path:', path.resolve('../../config/dbconfig'));
-
-// Log the path for Topic model
 console.log('Resolved Topic Model Path:', path.resolve('../../App/models/Topic.js'));
 
 const { DataTypes } = require('sequelize');
