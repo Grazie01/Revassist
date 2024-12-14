@@ -1,5 +1,7 @@
 const path = require('path');
 console.log('Resolved dbconfig Path:', path.resolve('../../config/dbconfig'));
+console.log('Resolved StudentReview Path:', path.resolve('./Flashcard_Questions'));
+console.log('Resolved StudentReview Path:', path.resolve('./Student_Review'));
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/dbconfig'); 
