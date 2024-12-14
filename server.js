@@ -27,7 +27,7 @@ const app = express();
 
 // CORS options
 var corsOptions = {
-    origin: "http://revassist.site",
+    origin: "https://revassist.site",
 };
 
 // Middleware
