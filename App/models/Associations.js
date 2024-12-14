@@ -1,3 +1,4 @@
+const path = require('path');
 const { AssessmentAnswers } = require(path.resolve('./App/models/AssessmentAnswers'));
 const { ReviewAnswers } = require(path.resolve('./App/models/ReviewAnswers'));
 const { SimulationAnswers } = require(path.resolve('./App/models/SimulationAnswers'));
