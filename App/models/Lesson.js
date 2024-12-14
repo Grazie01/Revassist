@@ -14,7 +14,7 @@ if (!sequelize) {
 
 const { Topic } = require(path.resolve('./App/models/Topic.js'));
 
-const Lesson = sequelize.define('Lessons', {
+const Lesson = sequelize.define('Lessons', {  
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
