@@ -22,12 +22,12 @@ const reviewRouter = require(path.resolve(__dirname, './App/routes/reviewRoutes'
 const assRouter = require(path.resolve(__dirname, './App/routes/assessmentRoutes'));
 const simRouter = require(path.resolve(__dirname, './App/routes/simulationRoutes'));
 
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 const app = express();
 
 // CORS options
 var corsOptions = {
-    origin: "http://localhost:8080",
+    origin: "http://localhost:3000",
 };
 
 // Middleware
