@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // Import the path module for resolving paths
+const path = require('path');
+const bodyParser = require('body-parser');
 
-// Load environment variables
 require('dotenv').config();
 
 const { Student } = require(path.resolve(__dirname, './App/models/Student'));
@@ -34,15 +34,16 @@ var corsOptions = {
 
 // Middleware
 app.use((req, res, next) => {
-    console.log('CORS middleware applied');
-    //console.log(`${req.method} ${req.url}`);
-    console.log("req: ", req)
-    //console.log('Headers:', req.headers);
+    console.log('Request Method:', req.method);
+    console.log('Request Headers:', req.headers);
+    console.log('Request Body:', req.body);
     next();
 });
 
+
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.resolve(__dirname, 'build')));
 
 app.options('*', cors(corsOptions));
