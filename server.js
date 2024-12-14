@@ -5,8 +5,6 @@ const path = require('path'); // Import the path module for resolving paths
 // Load environment variables
 require('dotenv').config();
 
-console.log("dirname= ", __dirname)
-
 const { createStudentTable, Student } = require(path.resolve(__dirname, './App/models/Student'));
 const { createLessonsTable, Lesson } = require(path.resolve(__dirname, './App/models/Lesson'));
 const { createAssessmentsTable, Assessment } = require(path.resolve(__dirname, './App/models/Assessment'));
