@@ -38,7 +38,7 @@ const StudentSimulation = sequelize.define('StudentSimulation', {
 
 const createStudentSimulationTable = async () => {
   try {
-    await StudentSimulation.sync();
+    await StudentSimulation.sync({ alter: true });
     console.log("StudentSimulation table created or already exists.");
   } catch (error) {
     console.error("Error creating StudentSimulation table:", error);

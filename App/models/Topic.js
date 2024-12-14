@@ -22,7 +22,7 @@ const Topic = sequelize.define('Topics', {
 
 const createTopicTable = async () => {
   try {
-    await Topic.sync();
+    await Topic.sync({ alter: true });
     console.log("Topic table created or already exists.");
   } catch (error) {
     console.error("Error creating Topic table:", error);

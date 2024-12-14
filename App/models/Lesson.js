@@ -38,7 +38,7 @@ const Lesson = sequelize.define('Lessons', {
 
 const createLessonsTable = async () => {
   try {
-    await Lesson.sync();
+    await Lesson.sync({ alter: true });
     console.log("Lessons table created or already exists.");
   } catch (error) {
     console.error("Error creating Lessons table:", error);

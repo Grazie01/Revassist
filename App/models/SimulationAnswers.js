@@ -41,7 +41,7 @@ const SimulationAnswers = sequelize.define('SimulationAnswers', {
 
 const createSimulationAnswersTable = async () => {
   try {
-    await SimulationAnswers.sync();
+    await SimulationAnswers.sync({ alter: true });
     console.log("SimulationAnswers table created or already exists.");
   } catch (error) {
     console.error("Error creating SimulationAnswers table:", error);

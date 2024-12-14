@@ -34,7 +34,7 @@ const Assessment = sequelize.define('Assessments', {
 
 const createAssessmentsTable = async () => {
   try {
-    await Assessment.sync();
+    await Assessment.sync({ alter: true });
     console.log("Assessments table created or already exists.");
   } catch (error) {
     console.error("Error creating Assessments table:", error);
