@@ -35,9 +35,9 @@ var corsOptions = {
 // Middleware
 app.use((req, res, next) => {
     console.log('CORS middleware applied');
-    console.log(`${req.method} ${req.url}`);
-    console.log("ansswer: ", req)
-    console.log('Headers:', req.headers);
+    //console.log(`${req.method} ${req.url}`);
+    console.log("req: ", req)
+    //console.log('Headers:', req.headers);
     next();
 });
 
