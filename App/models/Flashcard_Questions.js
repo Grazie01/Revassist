@@ -1,6 +1,6 @@
 const path = require('path');
 console.log('Resolved dbconfig Path:', path.resolve('../../config/dbconfig'));
-console.log('Resolved Review Path:', path.resolve('./Flashcard_Review'));
+console.log('Resolved Review Path:', path.resolve('../../config/dbconfig'));
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/dbconfig'); 

@@ -1,7 +1,7 @@
-const { AssessmentAnswers } = require("./AssessmentAnswers");
-const { ReviewAnswers } = require("./ReviewAnswers");
-const { SimulationAnswers } = require("./SimulationAnswers");
-const { StudentSimulation } = require("./Student_Simulation");
+const { AssessmentAnswers } = require(path.resolve('../../App/models/AssessmentAnswers'));
+const { ReviewAnswers } = require(path.resolve('../../App/models/ReviewAnswers'));
+const { SimulationAnswers } = require(path.resolve('../../App/models/SimulationAnswers'));
+const { StudentSimulation } = require(path.resolve('../../App/models/Student_Simulation'));
 
 // associations.js
 const setupAssociations = (models) => {

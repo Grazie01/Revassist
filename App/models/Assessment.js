@@ -8,11 +8,12 @@ if (!sequelize) {
   throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
 }
 
-const { Topic } = require('./Topic');
+const { Topic } = require(path.resolve('../../App/models/Topic.js'));
 
 const Assessment = sequelize.define('Assessments', {
     id: {
       type: DataTypes.INTEGER,
+      
       autoIncrement: true,
       primaryKey: true,
     },
