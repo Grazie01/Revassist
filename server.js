@@ -5,26 +5,22 @@ const path = require('path'); // Import the path module for resolving paths
 // Load environment variables
 require('dotenv').config();
 
-const { createStudentTable, Student } = require(path.resolve(__dirname, './App/models/Student'));
-const { createLessonsTable, Lesson } = require(path.resolve(__dirname, './App/models/Lesson'));
-const { createAssessmentsTable, Assessment } = require(path.resolve(__dirname, './App/models/Assessment'));
-const { createAssessmentQuestionsTable, AssessmentQuestion } = require(path.resolve(__dirname, './App/models/Question'));
-const { createReviewQuestionsTable, ReviewQuestion } = require(path.resolve(__dirname, './App/models/Flashcard_Questions'));
-const { createReviewTable, Review } = require(path.resolve(__dirname, './App/models/Flashcard_Review'));
-const { createStudentAssessmentsTable, StudentAssessment } = require(path.resolve(__dirname, './App/models/StudentAssessment'));
-const { createStudentReviewTable, StudentReview } = require(path.resolve(__dirname, './App/models/Student_Review'));
-const { createTopicTable, Topic } = require(path.resolve(__dirname, './App/models/Topic'));
+const { Student } = require(path.resolve(__dirname, './App/models/Student'));
+const { Lesson } = require(path.resolve(__dirname, './App/models/Lesson'));
+const { Assessment } = require(path.resolve(__dirname, './App/models/Assessment'));
+const { AssessmentQuestion } = require(path.resolve(__dirname, './App/models/Question'));
+const { ReviewQuestion } = require(path.resolve(__dirname, './App/models/Flashcard_Questions'));
+const { Review } = require(path.resolve(__dirname, './App/models/Flashcard_Review'));
+const { StudentAssessment } = require(path.resolve(__dirname, './App/models/StudentAssessment'));
+const { StudentReview } = require(path.resolve(__dirname, './App/models/Student_Review'));
+const { Topic } = require(path.resolve(__dirname, './App/models/Topic'));
 const userRouter = require(path.resolve(__dirname, './App/routes/userRoutes'));
 const topicRouter = require(path.resolve(__dirname, './App/routes/topicRoutes'));
 const setupAssociations = require(path.resolve(__dirname, './App/models/Associations'));
 const lessonRouter = require(path.resolve(__dirname, './App/routes/lessonRoutes'));
 const reviewRouter = require(path.resolve(__dirname, './App/routes/reviewRoutes'));
 const assRouter = require(path.resolve(__dirname, './App/routes/assessmentRoutes'));
-const { createStudentSimulationTable } = require(path.resolve(__dirname, './App/models/Student_Simulation'));
 const simRouter = require(path.resolve(__dirname, './App/routes/simulationRoutes'));
-const { createReviewAnswersTable } = require(path.resolve(__dirname, './App/models/ReviewAnswers'));
-const { createAssessmentAnswersTable } = require(path.resolve(__dirname, './App/models/AssessmentAnswers'));
-const { createSimulationAnswersTable } = require(path.resolve(__dirname, './App/models/SimulationAnswers'));
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -74,24 +70,6 @@ setupAssociations(models);
 
 const startServer = async () => {
     try {
-
-        await createStudentTable();
-        await createTopicTable();
-        await createLessonsTable();
-
-        await createAssessmentsTable();
-        await createReviewTable();
-
-        await createAssessmentQuestionsTable();
-        await createReviewQuestionsTable();
-        await createStudentAssessmentsTable();
-        await createStudentReviewTable();
-
-        await createStudentSimulationTable();
-        await createSimulationAnswersTable();
-
-        await createReviewAnswersTable();
-        await createAssessmentAnswersTable();
 
         app.listen(PORT, (error) => {
             if (!error) {

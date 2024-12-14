@@ -34,16 +34,6 @@ const ReviewQuestion = sequelize.define('ReviewQuestions', {
   },
 });
 
-const createReviewQuestionsTable = async () => {
-  try {
-    await ReviewQuestion.sync({ alter: true });
-    console.log("ReviewQuestions table created or already exists.");
-  } catch (error) {
-    console.error("Error creating ReviewQuestions table:", error);
-  }
-};
-
 module.exports = {
     ReviewQuestion,
-    createReviewQuestionsTable,
 };

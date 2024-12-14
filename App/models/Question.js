@@ -34,16 +34,6 @@ const AssessmentQuestion = sequelize.define('AssessmentQuestions', {
   },
 });
 
-const createAssessmentQuestionsTable = async () => {
-  try {
-    await AssessmentQuestion.sync({ alter: true });
-    console.log("AssessmentQuestions table created or already exists.");
-  } catch (error) {
-    console.error("Error creating AssessmentQuestions table:", error);
-  }
-};
-
 module.exports = {
     AssessmentQuestion,
-    createAssessmentQuestionsTable,
 };

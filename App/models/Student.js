@@ -50,16 +50,6 @@ const Student = sequelize.define('Student', {
   },
 });
 
-const createStudentTable = async () => {
-  try {
-    await Student.sync({ alter: true });
-    console.log("Student table created or already exists.");
-  } catch (error) {
-    console.error("Error creating Student table:", error);
-  }
-};
-
 module.exports = {
   Student,
-  createStudentTable,
 };
