@@ -27,20 +27,24 @@ const app = express();
 
 var corsOptions = {
     origin: "https://revassist.site",
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Add the methods your app needs
-    allowedHeaders: ['Content-Type', 'Authorization'],  // Allow necessary headers
-    credentials: true,  // Allow cookies or credentials if needed
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    credentials: true,  
 };
 
 // Middleware
 app.use((req, res, next) => {
-    console.log(`${req.method} request to ${req.url}`);
+    console.log('CORS middleware applied');
+    console.log(`${req.method} ${req.url}`);
+    console.log('Headers:', req.headers);
     next();
 });
 
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(express.static(path.resolve(__dirname, 'build')));
+
+app.options('*', cors(corsOptions));
 
 // Routes
 app.get('/', (req, res) => {
