@@ -8,7 +8,7 @@ if (!sequelize) {
   throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
 }
 
-const { Topic } = require(path.resolve('./Topic.js'));
+const { Topic } = require(path.resolve(__dirname,  './Topic.js'));
 
 const Assessment = sequelize.define('Assessments', {
     id: {
