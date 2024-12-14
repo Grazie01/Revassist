@@ -25,9 +25,11 @@ const simRouter = require(path.resolve(__dirname, './App/routes/simulationRoutes
 const PORT = process.env.PORT || 3001
 const app = express();
 
-// CORS options
 var corsOptions = {
     origin: "https://revassist.site",
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Add the methods your app needs
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Allow necessary headers
+    credentials: true,  // Allow cookies or credentials if needed
 };
 
 // Middleware
