@@ -32,6 +32,7 @@ async function loginUser(req, res) {
 
         res.json({ message: 'Login successful', token, studentId: student.id });
     } catch (error) {
+        console.log(error.message )
         res.status(500).json({ error: 'Login failed', details: error.message });
     }
 }
