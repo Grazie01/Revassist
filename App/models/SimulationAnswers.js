@@ -8,7 +8,7 @@ const sequelize = require('../../config/dbconfig');
 if (!sequelize) {
   throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
 }
-const { StudentSimulation } = require(path.resolve('../../App/models/Student_Simulation'));
+const { StudentSimulation } = require(path.resolve('./App/models/Student_Simulation'));
 
 const SimulationAnswers = sequelize.define('SimulationAnswers', {
     id: {
