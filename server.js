@@ -27,7 +27,7 @@ const app = express();
 
 // CORS options
 var corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:8080",
 };
 
 // Middleware
