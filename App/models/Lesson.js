@@ -12,7 +12,7 @@ if (!sequelize) {
 
 const { Topic } = require(path.resolve(__dirname, './Topic.js'));
 
-const Lesson = sequelize.define('Lessons', {  
+const Lesson = sequelize.define('lessons', {  
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,

@@ -8,7 +8,7 @@ if (!sequelize) {
   throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
 }
 
-const Student = sequelize.define('student', {
+const Student = sequelize.define('students', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,

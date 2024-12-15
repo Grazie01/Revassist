@@ -12,7 +12,7 @@ if (!sequelize) {
 const { ReviewQuestion } = require(path.resolve(__dirname,'./Flashcard_Questions'));
 const { StudentReview } = require(path.resolve(__dirname,'./Student_Review'));
 
-const ReviewAnswers = sequelize.define('ReviewAnswers', {
+const ReviewAnswers = sequelize.define('reviewanswers', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,

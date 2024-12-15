@@ -10,7 +10,7 @@ if (!sequelize) {
 
 const { Topic } = require(path.resolve(__dirname,  './Topic.js'));
 
-const Assessment = sequelize.define('Assessments', {
+const Assessment = sequelize.define('assessments', {
     id: {
       type: DataTypes.INTEGER,
       

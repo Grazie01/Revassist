@@ -10,7 +10,7 @@ if (!sequelize) {
 }
 const { Student } = require(path.resolve(__dirname, './Student'));
 
-const StudentSimulation = sequelize.define('StudentSimulation', {
+const StudentSimulation = sequelize.define('studentsimulation', {
   id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,

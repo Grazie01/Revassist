@@ -13,7 +13,7 @@ if (!sequelize) {
 const { AssessmentQuestion } = require(path.resolve(__dirname, './Question.js'));
 const { StudentAssessment } = require(path.resolve(__dirname, './StudentAssessment.js'));
 
-const AssessmentAnswers = sequelize.define('AssessmentAnswers', {
+const AssessmentAnswers = sequelize.define('assessmentanswers', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
