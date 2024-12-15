@@ -61,6 +61,15 @@ app.use('/api/review', reviewRouter);
 app.use('/api/assessment', assRouter);
 app.use('/api/simulations', simRouter);
 
+app.use((req, res, next) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    } else {
+      next();
+    }
+  });
+  
+
 require(path.resolve(__dirname, './App/models/Associations'));
 
 const models = {
