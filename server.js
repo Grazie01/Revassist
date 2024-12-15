@@ -45,7 +45,9 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.resolve(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, "build")));
+
+res.sendFile(path.join(__dirname, "build", "index.html"));
 
 app.options('*', cors(corsOptions));
 
@@ -60,14 +62,6 @@ app.use('/api/lessons', lessonRouter);
 app.use('/api/review', reviewRouter);
 app.use('/api/assessment', assRouter);
 app.use('/api/simulations', simRouter);
-
-app.use((req, res, next) => {
-    if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(__dirname, 'build', 'index.html'));
-    } else {
-      next();
-    }
-  });
   
 
 require(path.resolve(__dirname, './App/models/Associations'));
