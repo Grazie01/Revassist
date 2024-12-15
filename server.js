@@ -47,7 +47,9 @@ app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "build")));
 
-res.sendFile(path.join(__dirname, "build", "index.html"));
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+  });
 
 app.options('*', cors(corsOptions));
 
