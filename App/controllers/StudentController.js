@@ -5,6 +5,7 @@ async function loginUser(req, res) {
     const { email, password } = req.body;
 
     try {
+        console.log("email: ", email, " password: ", password)
         const student = await Student.findOne({ where: { email } });
 
         if (!student || student.password !== password) {

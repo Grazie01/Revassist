@@ -29,15 +29,15 @@ var corsOptions = {
     origin: "https://revassist.site",
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
     allowedHeaders: ['Content-Type', 'Authorization'], 
-    credentials: false,  
+    credentials: true,  
 };
 
 // Middleware
 app.use((req, res, next) => {
-    //console.log('Request Method:', req.method);
-    //console.log('Request Headers:', req.headers);
-    //console.log('Request Body:', req.body);
-    console.log('Request:', req);
+    console.log('Request Method:', req.method);
+    console.log('Request Headers:', req.headers);
+    console.log('Request Body:', req.body);
+    //console.log('Request:', req);
     next();
 });
 
