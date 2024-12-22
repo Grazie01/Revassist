@@ -1,9 +1,9 @@
-const { ReviewQuestion } = require("../models/Flashcard_Questions");
-const { Review } = require("../models/Flashcard_Review");
-const { Lesson } = require("../models/Lesson");
-const { ReviewAnswers } = require("../models/ReviewAnswers");
-const { StudentReview } = require("../models/Student_Review");
-const { calculateConfidenceLevel, getNumberOfQuestions, convertTimeToSeconds, timeToSeconds, secondsToTime } = require("./UtilityFunctions");
+const { ReviewQuestion } = require(path.resolve(__dirname,"../models/Flashcard_Questions"));
+const { Review } = require(path.resolve(__dirname,"../models/Flashcard_Review"));
+const { Lesson } = require(path.resolve(__dirname,"../models/Lesson"));
+const { ReviewAnswers } = require(path.resolve(__dirname,"../models/ReviewAnswers"));
+const { StudentReview } = require(path.resolve(__dirname,"../models/Student_Review"));
+const { calculateConfidenceLevel, getNumberOfQuestions, convertTimeToSeconds, timeToSeconds, secondsToTime } = require(path.resolve(__dirname,"./UtilityFunctions"));
 
 async function getReviewQuestions(req, res) {
     const { lessonId } = req.params;
@@ -287,8 +287,9 @@ async function setReviewAnswer(req, res) {
       
       const answerCards = await getReviewAnswersOneQuestion(studentReviewId)
       let confidence_level = calculateConfidenceLevel(answerCards.map(card => card.dataValues), partialQuestionAmount);
+      
 
-      let latestReview = await getLatestStudentReview(studentId, reviewId); //
+      let latestReview = await getLatestStudentReview(studentId, reviewId); 
         console.log ("latestReview: ",latestReview )
   
       if (confidence_level >= passingScore)
@@ -449,8 +450,7 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
           error: "Student ID is required.",
         });
       }
-  
-      // Fetch the review records with associated answers and lesson details
+
       const reviewRecords = await StudentReview.findAll({
         where: {
           student_key: studentId,
@@ -458,31 +458,29 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
         include: [
           {
             model: Review,
-            as: 'review', // Ensure alias matches the association in the Review model
+            as: 'review',
             include: [
               {
                 model: Lesson,
-                as: 'lesson', // Include lesson information
-                attributes: ['title'], // Only include the lesson title
+                as: 'lesson', 
+                attributes: ['title'], 
               },
             ],
           },
         ],
       });
   
-      // Check if any records were found
       if (!reviewRecords || reviewRecords.length === 0) {
         return res.status(404).json({
           error: "No review records found for this student.",
         });
       }
   
-      // Return the review records along with lesson title
       return res.status(200).json({
         message: "Review records retrieved successfully.",
         data: reviewRecords.map(record => ({
           ...record.toJSON(),
-          lessonTitle: record.review.lesson.title, // Add lesson title to the result
+          lessonTitle: record.review.lesson.title, 
         })),
       });
     } catch (error) {
@@ -498,22 +496,20 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
     const { studentReviewId } = req.params;
   
     try {
-      // Validate that studentReviewId is provided
       if (!studentReviewId) {
         return res.status(400).json({ error: "studentReviewId is required." });
       }
   
-      // Fetch the StudentReview record with associated Review, Questions, and filtered Answers
       const studentReview = await StudentReview.findOne({
-        where: { id: studentReviewId },  // Find the StudentReview by its ID
+        where: { id: studentReviewId },
         include: [
           {
             model: Review, 
             as: 'review',  
             include: [
               {
-                model: ReviewQuestion,  // Fetch the associated ReviewQuestions
-                as: 'questions', // Alias for the questions in Review
+                model: ReviewQuestion,  
+                as: 'questions', 
               }
             ]
           },
@@ -526,36 +522,30 @@ const calculateTotalTimeTaken = async (studentReviewId) => {
         ]
       });
   
-      // Check if the StudentReview record exists
       if (!studentReview) {
         return res.status(404).json({ message: "Student review not found." });
       }
   
-      // Prepare the data to return, including questions and answers grouped together
       const reviewData = {
         reviewId: studentReview.id,
         studentId: studentReview.student_key,  
         createdAt: studentReview.createdAt,
         questionsAndAnswers: studentReview.review.questions.map((question) => {
-          // Filter the answers that belong to this specific question
           const answersForQuestion = studentReview.answers.filter(answer => answer.review_question_key === question.id);  
           
-          // Map answers and include 'isCorrect' and 'answer' field
           const answers = answersForQuestion.map(answer => ({
             answer: answer.answer,
             isCorrect: answer.is_correct,
           }));
   
-          // Return the question along with its answers (including the correct answer)
           return {
             question: question.query,  
             answers: answers,         
-            correct_answer: question.answer,  // Correct answer for the question
+            correct_answer: question.answer, 
           };
-        }).filter(q => q.answers.length > 0),  // Filter out questions without answers
+        }).filter(q => q.answers.length > 0),
       };
   
-      // Return the grouped questions and answers data
       res.status(200).json(reviewData);
   
     } catch (error) {

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {Student} = require('../models/Student');
+const {Student} = require(path.resolve(__dirname,'../models/Student'));
 
 async function loginUser(req, res) {
     const { email, password } = req.body;

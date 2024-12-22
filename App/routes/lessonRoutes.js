@@ -1,5 +1,5 @@
 const express = require('express');
-const { getLesson, getVideo } = require('../controllers/LessonController');
+const { getLesson, getVideo } = require(path.resolve(__dirname,'../controllers/LessonController'));
 const lessonRouter = express.Router();
 
 lessonRouter.get('/:topicid/:lessonid', getLesson);

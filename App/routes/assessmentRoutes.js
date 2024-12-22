@@ -8,7 +8,7 @@ const {  getAllAssessments,
     getAssessmentAnswers,
     setAssessmentAnswer,
     getLatestStudentAssessmentAPI,
-    getAssessmentRecord, } = require('../controllers/AssessmentController');
+    getAssessmentRecord, } = require(path.resolve(__dirname,'../controllers/AssessmentController'));
 
 const assRouter = express.Router();
 assRouter.get('/get-next-available-id', getNextAvailableId);

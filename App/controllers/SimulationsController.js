@@ -1,6 +1,6 @@
-const { SimulationAnswers } = require("../models/SimulationAnswers");
-const { Student } = require("../models/Student");
-const { StudentSimulation } = require("../models/Student_Simulation");
+const { SimulationAnswers } = require(path.resolve(__dirname,"../models/SimulationAnswers"));
+const { Student } = require(path.resolve(__dirname,"../models/Student"));
+const { StudentSimulation } = require(path.resolve(__dirname,"../models/Student_Simulation"));
 
 
 async function setSimRecord(req, res) {

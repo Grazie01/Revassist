@@ -1,10 +1,10 @@
-const { Assessment } = require("../models/Assessment");
-const { AssessmentAnswers } = require("../models/AssessmentAnswers");
-const { AssessmentQuestion } = require("../models/Question");
-const { StudentAssessment } = require("../models/StudentAssessment");
-const { Topic } = require("../models/Topic");
+const { Assessment } = require(path.resolve(__dirname,"../models/Assessment"));
+const { AssessmentAnswers } = require(path.resolve(__dirname,"../models/AssessmentAnswers"));
+const { AssessmentQuestion } = require(path.resolve(__dirname,"../models/Question"));
+const { StudentAssessment } = require(path.resolve(__dirname,"../models/StudentAssessment"));
+const { Topic } = require(path.resolve(__dirname,"../models/Topic"));
 const { Op } = require('sequelize');
-const { timeToSeconds, secondsToTime, convertTimeToSeconds, calculateConfidenceLevel, calculateModelConfidenceLevel, getNumberOfQuestions } = require("./UtilityFunctions");
+const { timeToSeconds, secondsToTime, convertTimeToSeconds, calculateConfidenceLevel, calculateModelConfidenceLevel, getNumberOfQuestions } = require(path.resolve(__dirname,"./UtilityFunctions"));
 
 async function getAllAssessments(req, res) {
   try {
@@ -37,20 +37,19 @@ async function getLatestStudentAssessment(studentId, assessmentId) {
       return 'studentId and assessmentId are required.';
     }
 
-    // Fetch the latest student assessment for the given student and assessment
     const latestAssessment = await StudentAssessment.findOne({
       where: {
         student_key: studentId,
         assessment_key: assessmentId,
       },
-      order: [['createdAt', 'DESC']], // Order by the latest creation time
+      order: [['createdAt', 'DESC']], 
     });
 
     if (!latestAssessment) {
       return 'No assessment record found for this student and assessment.';
     }
 
-    return latestAssessment; // Return the latest student assessment record
+    return latestAssessment; 
   } catch (error) {
     console.error('Error fetching the latest student assessment:', error);
     return 'An error occurred while fetching the latest assessment record.';
@@ -62,9 +61,8 @@ async function getAssessment(req, res) {
   let level = 0;
 
   try {
-    // Fetch the assessment with associated questions and answers
     const assessment = await Assessment.findOne({
-      where: { id: topicId }, // topicId corresponds to the Assessment ID
+      where: { id: topicId },
       include: [
         {
           model: AssessmentQuestion,
@@ -94,23 +92,18 @@ async function getAssessment(req, res) {
     let questionsAmount = await countQuestionsInAssessment(topicId);
     let partialQuestionAmount = getNumberOfQuestions(level, questionsAmount);
 
-    // Prepare the array of questions to return
     const questionsToReturn = [];
-    const uniqueQuestions = new Set();  // Track unique question IDs
-    let totalQuestionsAdded = 0; // Track total questions added (including repetitions)
+    const uniqueQuestions = new Set();  
+    let totalQuestionsAdded = 0; 
 
-    // Iterate over the questions in the assessment
     for (const question of assessment.assessment_questions) {
-      // Only proceed if we still have room for unique questions
       if (uniqueQuestions.size >= partialQuestionAmount) break;
 
-      // Extract the confidence levels from related answers
       const answers = question.assessment_answer || [];
-      const latestAnswer = answers[answers.length - 1]; // Assuming latest answer determines confidence level
+      const latestAnswer = answers[answers.length - 1]; 
       const confidenceLevel = latestAnswer ? latestAnswer.confidence_level : null;
 
-      // Determine how many times this question should appear based on confidence level
-      let timesToAppear = 1; // Default
+      let timesToAppear = 1;
       if (confidenceLevel !== null && confidenceLevel <= 60) {
         timesToAppear = 5; 
       } else if (confidenceLevel > 60 && confidenceLevel <= 80 ) {
@@ -119,36 +112,31 @@ async function getAssessment(req, res) {
         timesToAppear = 2; 
       }
 
-      // Add the question once (as a unique question) if it's not already added
       if (!uniqueQuestions.has(question.id)) {
         questionsToReturn.push({
           id: question.id,
-          question_text: question.query,  // Assuming `question_text` is `query`
+          question_text: question.query, 
           confidence_level: confidenceLevel,
         });
-        uniqueQuestions.add(question.id);  // Mark this question as added
-        totalQuestionsAdded++; // Increment the total number of questions added
+        uniqueQuestions.add(question.id);  
+        totalQuestionsAdded++; 
       }
 
-      // Repeat the question the appropriate number of times (only count towards repetitions)
-      for (let i = 1; i < timesToAppear; i++) { // Start from 1 because the first appearance is already added
+      for (let i = 1; i < timesToAppear; i++) { 
         questionsToReturn.push({
           id: question.id,
           question_text: question.query,
           confidence_level: confidenceLevel,
         });
 
-        // If we've reached the limit of total questions (including repetitions), stop
         if (totalQuestionsAdded >= partialQuestionAmount) break;
       }
 
-      // If we've reached the limit on total questions (including repetitions), stop
       if (totalQuestionsAdded >= partialQuestionAmount) break;
     }
 
     console.log("this assessment: ", assessment.dataValues)
 
-    // Return the assessment and formatted questions
     res.status(200).json({
       assessment: {
         
@@ -176,13 +164,12 @@ async function getLatestStudentAssessmentAPI(req, res) {
       });
     }
 
-    // Fetch the latest student assessment for the given student and topic
     const latestAssessment = await StudentAssessment.findOne({
       where: {
         student_key: studentId,
         assessment_key: topicId,
       },
-      order: [["createdAt", "DESC"]], // Order by the latest creation time
+      order: [["createdAt", "DESC"]], 
     });
 
     if (!latestAssessment) {
@@ -191,7 +178,6 @@ async function getLatestStudentAssessmentAPI(req, res) {
       });
     }
 
-    // Return the latest student assessment record
     return res.status(200).json(latestAssessment);
   } catch (error) {
     console.error("Error fetching the latest student assessment:", error);
@@ -205,22 +191,18 @@ async function getLatestStudentAssessmentAPI(req, res) {
 async function checkAnswer(questionId, userAns) {
   console.log ("questionid: ", questionId, "user answer: ",userAns)
   try {
-    // Fetch the question by ID
     const question = await AssessmentQuestion.findOne({ where: { id: questionId } });
     console.log("question: ", question)
-    // Handle case where question is not found
     if (!question) {
       throw new Error("Question not found");
     }
 
-    // Check if the user's answer matches the correct answer
     const isCorrect = userAns === question.answer;
 
     return isCorrect;
   } catch (error) {
     console.error("Error checking answer:", error.message);
-    // Handle error appropriately (return false, or rethrow if needed)
-    return null; // Indicates an error occurred
+    return null; 
   }
 }
 
@@ -228,16 +210,13 @@ async function addStudentAssessment(req, res) {
   const { studentId, topicId } = req.body;
 
   try {
-    // Fetch the latest assessment record for the student and assessment
     let latestrecord = await getLatestStudentAssessment(studentId, topicId);
 
-    // Check if the latest record exists
-    let level = 0; // Default level is 0
+    let level = 0;
     if (latestrecord && latestrecord.dataValues) {
       level = latestrecord.dataValues.review_level
     }
 
-    // Create a new assessment record
     const newRecord = await StudentAssessment.create({
       student_key: studentId,
       assessment_key: topicId,
@@ -346,30 +325,28 @@ async function getAssessmentRecord(req, res) {
   const { assessmentId } = req.params;
 
   try {
-    // Validate that assessmentId is provided
     if (!assessmentId) {
       return res.status(400).json({ error: "Student Assessment ID is required." });
     }
 
-    // Fetch the StudentAssessment record with associated Assessment, Questions, and filtered Answers
     const studentAssessment = await StudentAssessment.findOne({
-      where: { id: assessmentId },  // Find the StudentAssessment by its ID
+      where: { id: assessmentId },  
       include: [
         {
-          model: Assessment,  // Fetch the associated Assessment
-          as: 'assessment',   // Alias for the Assessment
+          model: Assessment, 
+          as: 'assessment',  
           include: [
             {
-              model: AssessmentQuestion,  // Fetch the associated AssessmentQuestions
-              as: 'assessment_questions', // Alias for the questions in Assessment
+              model: AssessmentQuestion,  
+              as: 'assessment_questions',
             }
           ]
         },
         {
-          model: AssessmentAnswers,  // Fetch the related AssessmentAnswers
-          as: 'answers',  // Alias for answers related to the StudentAssessment
-          where: { assessment_id_key: assessmentId }, // Correct filtering condition for answers
-          required: false  // Allow questions without answers (i.e., optional answers)
+          model: AssessmentAnswers, 
+          as: 'answers', 
+          where: { assessment_id_key: assessmentId },
+          required: false  
         }
       ]
     });
@@ -379,7 +356,6 @@ async function getAssessmentRecord(req, res) {
       return res.status(404).json({ message: "Student assessment not found." });
     }
 
-    // Prepare the data to return, including questions and answers grouped together
     const assessmentData = {
       assessmentId: studentAssessment.id,
       studentId: studentAssessment.student_id,  
@@ -400,7 +376,6 @@ async function getAssessmentRecord(req, res) {
       }).filter(q => q.answers.length > 0) 
     };
 
-    // Return the grouped questions and answers data
     res.status(200).json(assessmentData);
   } catch (error) {
     console.error("Error getting assessment record:", error);
@@ -444,11 +419,10 @@ async function getLatestStudentAssessmentId(req, res) {
 
 async function calculateScore(assessmentId) {
   try {
-    // Count the number of correct answers for the given assessment
     const correctAnswersCount = await AssessmentAnswers.count({
       where: {
         assessment_id_key: assessmentId,
-        is_correct: true, // Only count correct answers
+        is_correct: true, 
       },
     });
 
@@ -461,43 +435,36 @@ async function calculateScore(assessmentId) {
   }
 }
 
-// Function to calculate total time taken for a StudentAssessment
 const calculateTotalTimeTaken = async (assessmentId) => {
   try {
-    // Fetch all assessment answers related to the given StudentAssessment
     const answers = await AssessmentAnswers.findAll({
       where: { assessment_id_key: assessmentId },
     });
 
-    // If no answers found, return 0
     if (answers.length === 0) {
-      return '00:00:00'; // No time recorded
+      return '00:00:00'; 
     }
 
-    // Sum up all the time_taken values in seconds
     const totalTimeInSeconds = answers.reduce((total, answer) => {
-      const timeInSeconds = timeToSeconds(answer.time_taken); // Convert each time_taken to seconds
+      const timeInSeconds = timeToSeconds(answer.time_taken); 
       return total + timeInSeconds;
     }, 0);
 
-    // Convert the total seconds back into HH:MM:SS format
     const totalTimeFormatted = secondsToTime(totalTimeInSeconds);
     return totalTimeFormatted;
 
   } catch (error) {
     console.error("Error calculating total time taken:", error);
-    return '00:00:00'; // Return 0 if error occurs
+    return '00:00:00'; 
   }
 };
 
 const countQuestionsInAssessment = async (assessmentKey) => {
   try {
-    // Ensure the assessmentKey is provided
     if (!assessmentKey) {
       throw new Error("Assessment key is required.");
     }
 
-    // Count the number of questions associated with the assessment key
     const questionCount = await AssessmentQuestion.count({
       where: { assessment_key: assessmentKey },
     });
@@ -514,12 +481,10 @@ async function updateRecordedScore(req, res) {
   console.log ("studentId: ", studentId, "testId: ", testId, "topicId: ", topicId)
   const passingScore = 80;
   try {
-    // Check if the student's assessment record exists
     let studentAssessment = await StudentAssessment.findOne({
       where: { student_key: studentId, id: testId },
     });
 
-    // Calculate score and total time taken
     let score = await calculateScore(testId);
     let totalTime = await calculateTotalTimeTaken(testId);
     let formattedTotalTime = convertTimeToSeconds(totalTime);
@@ -544,15 +509,12 @@ async function updateRecordedScore(req, res) {
 
     console.log ("revew level: ", studentAssessment.review_level)
 
-    // Update recorded score and total time taken
     studentAssessment.total_confidence_level = confidence_level;
     studentAssessment.recorded_score = score;
     studentAssessment.total_time_taken = totalTime;
 
-    // Save the updated or newly created record
     await studentAssessment.save();
 
-    // Respond with the updated score
     return res.status(200).json({ studentAssessment });
   } catch (error) {
     console.error("Error updating recorded score:", error);
@@ -605,14 +567,13 @@ async function getSingleAssessmentAnswersArguement(assessmentId) {
         assessment_id_key: assessmentId,
       },
       attributes: ['id', 'assessment_question_key', 'is_correct', 'time_taken', 'confidence_level'],
-      order: [['createdAt', 'DESC']], // Sort by createdAt in descending order
+      order: [['createdAt', 'DESC']],
     });
 
     if (!answers || answers.length === 0) {
       return 'No answers found for the given assessment.';
     }
 
-    // To ensure we only return the latest answer for each question
     const latestAnswers = [];
     const seenQuestions = new Set();
 
@@ -623,7 +584,6 @@ async function getSingleAssessmentAnswersArguement(assessmentId) {
       }
     }
 
-    // Log only the confidence level of the latest answers
     latestAnswers.forEach((answer) => {
       console.log(`Confidence Level for Question ID ${answer.assessment_question_key}: ${answer.confidence_level}`);
     });
@@ -694,21 +654,18 @@ async function setAssessmentAnswer(req, res) {
   console.log(`Received: assessmentId=${assessmentId}, questionId=${questionId}, timeTaken=${timeTaken}, answer=${answer}`);
 
   try {
-    // Validate input
     if (!assessmentId || !questionId || !timeTaken || answer === undefined) {
       return res.status(400).json({
         error: "Assessment ID, Question ID, Time Taken, and Answer fields are required.",
       });
     }
 
-    // Validate correctness of the answer
     const isCorrect = await checkAnswer(questionId, answer);
     if (isCorrect === null) {
       return res.status(400).json({ error: "Error checking the answer. Please try again." });
     }
     console.log("is correct: ", isCorrect);
 
-    // Create a new answer record
     console.log("Creating new answer record...");
     const newAnswer = await AssessmentAnswers.create({
       assessment_id_key: assessmentId,

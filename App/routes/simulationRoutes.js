@@ -4,7 +4,7 @@ const {
     getStudentSimulations,
     setSimAnswer,
     getSimulationAnswers,
-} = require('../controllers/SimulationsController');
+} = require(path.resolve(__dirname,'../controllers/SimulationsController'));
 const simRouter = express.Router();
 
 simRouter.get('/get-simulation-records/:studentId', getStudentSimulations)

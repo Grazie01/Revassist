@@ -1,4 +1,4 @@
-const { Lesson } = require("../models/Lesson");
+const { Lesson } = require(path.resolve(__dirname,"../models/Lesson"));
 const { YoutubeTranscript } = require("youtube-transcript")
 
 async function getLesson(req, res) { 

@@ -1,10 +1,8 @@
-// Utility function to convert TIME (HH:MM:SS) into total seconds
 const timeToSeconds = (time) => {
     const [hours, minutes, seconds] = time.split(':').map(Number);
     return (hours * 3600) + (minutes * 60) + seconds;
 };
   
-  // Utility function to convert total seconds back into HH:MM:SS format
 const secondsToTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
