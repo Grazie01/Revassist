@@ -42,6 +42,7 @@ async function loginUser(req, res) {
 
 async function getUser(req, res) {
     const { studentId } = req.params;
+    console.log("getting student")
 
     try {
         const student = await Student.findOne({ where: { id: parseInt(studentId, 10) } });
@@ -51,7 +52,7 @@ async function getUser(req, res) {
         }
 
         const { email, fname, lname, frequency } = student;
-
+        console.log("found student")
         res.json({ message: 'Login successful', student: { email, fname, lname, frequency } });
     } catch (error) {
         res.status(500).json({ error: 'Login failed', details: error.message });
