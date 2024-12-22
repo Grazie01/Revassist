@@ -34,6 +34,7 @@ var corsOptions = {
 
 // Middleware
 app.use((req, res, next) => {
+    const startTime = Date.now()
     //console.log('Request Method:', req.method);
     //console.log('Request Headers:', req.headers);
     //console.log('Request Body:', req.body);
