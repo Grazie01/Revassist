@@ -30,6 +30,9 @@ async function getVideo(req, res) {
     console.log("GET request to /get-video with ID:", videoId);
   
     try {
+      if (!videoId || typeof videoId !== 'string') {
+          return res.status(400).json({ error: "Invalid video ID" });
+      }
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
   
       if (!transcript) {
