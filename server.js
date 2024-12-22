@@ -35,7 +35,7 @@ var corsOptions = {
 // Middleware
 app.use((req, res, next) => {
     const startTime = Date.now()
-    console.log('Request URL:', req.originalUrl);
+    console.log(`${req.method} ${req.originalUrl}`);
 
     const originalSend = res.send;
     res.send = function (body) {
@@ -58,25 +58,25 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "build")));
 
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "build", "index.html"));
-  });
-
-app.options('*', cors(corsOptions));
-
-// Routes
-app.get('/', (req, res) => {
-    res.status(200).send("Welcome to the root URL of Server");
-});
-
+// API Routes
 app.use('/api/users', userRouter);
 app.use('/api/topics', topicRouter);
 app.use('/api/lessons', lessonRouter);
 app.use('/api/review', reviewRouter);
 app.use('/api/assessment', assRouter);
 app.use('/api/simulations', simRouter);
+
+app.use(express.static(path.join(__dirname, "build")));
+
+app.use('/api/*', (req, res) => {
+    res.status(404).json({ error: 'API route not found' });
+});
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
   
 
 require(path.resolve(__dirname, './App/models/Associations'));
