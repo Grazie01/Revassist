@@ -1,3 +1,4 @@
+const path = require('path');
 const { Lesson } = require(path.resolve(__dirname,"../models/Lesson"));
 const { YoutubeTranscript } = require("youtube-transcript")
 

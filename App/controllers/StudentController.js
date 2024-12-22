@@ -1,3 +1,4 @@
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const {Student} = require(path.resolve(__dirname,'../models/Student'));
 

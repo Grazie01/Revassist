@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const { getReviewQuestions, createStudentReview, setReviewAnswer, updateRecordedScore, getReview, getReviewRecords, getReviewRecord } = require(path.resolve(__dirname,'../controllers/ReviewController'));
 const reviewRouter = express.Router();
 

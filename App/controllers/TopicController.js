@@ -1,3 +1,4 @@
+const path = require('path');
 const { Topic } = require(path.resolve(__dirname,'../models/Topic'));
 const { Lesson } = require(path.resolve(__dirname,'../models/Lesson'));
 

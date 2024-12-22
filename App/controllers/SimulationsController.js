@@ -1,3 +1,4 @@
+const path = require('path');
 const { SimulationAnswers } = require(path.resolve(__dirname,"../models/SimulationAnswers"));
 const { Student } = require(path.resolve(__dirname,"../models/Student"));
 const { StudentSimulation } = require(path.resolve(__dirname,"../models/Student_Simulation"));
