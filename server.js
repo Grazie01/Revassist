@@ -34,10 +34,26 @@ var corsOptions = {
 
 // Middleware
 app.use((req, res, next) => {
-    console.log('Request Method:', req.method);
-    console.log('Request Headers:', req.headers);
-    console.log('Request Body:', req.body);
+    //console.log('Request Method:', req.method);
+    //console.log('Request Headers:', req.headers);
+    //console.log('Request Body:', req.body);
     //console.log('Request:', req);
+
+    // Capture the response details
+    const originalSend = res.send;
+    res.send = function (body) {
+        console.log(`Outgoing Response:`);
+        console.log(`- Status Code: ${res.statusCode}`);
+        console.log(`- Headers: ${JSON.stringify(res.getHeaders(), null, 2)}`);
+        console.log(`- Body: ${body}`);
+
+        originalSend.call(this, body); // Call the original `send` function
+    };
+
+    res.on('finish', () => {
+        const duration = Date.now() - startTime;
+        console.log(`Request completed in ${duration}ms`);
+    });
     next();
 });
 
