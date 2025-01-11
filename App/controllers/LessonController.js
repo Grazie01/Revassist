@@ -37,10 +37,6 @@ async function getVideo(req, res) {
         languages: ["en", "auto"],
       });
   
-      if (!transcript) {
-        return res.status(404).json({ transcript });
-      }
-  
       res.json({ transcript });
     } catch (error) {
       console.error("Error fetching transcript:", error);
