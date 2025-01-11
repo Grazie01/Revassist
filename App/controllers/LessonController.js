@@ -36,7 +36,7 @@ async function getVideo(req, res) {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
   
       if (!transcript) {
-        return res.status(404).json({ error: "Transcript not available for this video" });
+        return res.status(404).json({ transcript });
       }
   
       res.json({ transcript });
