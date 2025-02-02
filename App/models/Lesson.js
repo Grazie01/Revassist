@@ -12,6 +12,10 @@ const Lesson = sequelize.define('Lessons', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
   videoID: {
     type: DataTypes.STRING,
     allowNull: false,
