@@ -1,53 +1,65 @@
 const express = require('express');
-const cors = require("cors");
-const { initializeDatabase } = require('./config/dbconfig'); 
-const { createStudentTable, Student } = require('./App/models/Student');
-const { createLessonsTable, Lesson } = require('./App/models/Lesson');
-const { createAssessmentsTable, Assessment } = require('./App/models/Assessment');
-const { createAssessmentQuestionsTable, AssessmentQuestion } = require('./App/models/Question');
-const { createReviewQuestionsTable, ReviewQuestion } = require('./App/models/Flashcard_Questions');
-const { createReviewTable, Review } = require('./App/models/Flashcard_Review');
-const { createStudentAssessmentsTable, StudentAssessment } = require('./App/models/StudentAssessment');
-const { createStudentReviewTable, StudentReview } = require('./App/models/Student_Review');
-const { createTopicTable, Topic } = require('./App/models/Topic');
-const userRouter = require('./App/routes/userRoutes');
-const topicRouter = require('./App/routes/topicRoutes');
-const setupAssociations = require('./App/models/Associations');
-const lessonRouter = require('./App/routes/lessonRoutes');
-const reviewRouter = require('./App/routes/reviewRoutes');
-const assRouter = require('./App/routes/assessmentRoutes');
-const { createSimulationsTable } = require('./App/models/Simulation');
-const { createStudentSimulationTable } = require('./App/models/Student_Simulation');
-const { createSimulationDialogueTable } = require('./App/models/Simulation_Dialogues');
-const simRouter = require('./App/routes/simulationRoutes');
-const { createEndingdialogueTable } = require('./App/models/endingdialogue');
-const { createCorrectdialoguerepliesTable } = require('./App/models/correctdialoguereplies');
-const { createReviewAnswersTable } = require('./App/models/ReviewAnswers');
-const { createAssessmentAnswersTable } = require('./App/models/AssessmentAnswers');
-
-const PORT = process.env.PORT || 8080;
-const app = express();
+const cors = require('cors');
+const path = require('path');
+const bodyParser = require('body-parser');
 
 require('dotenv').config();
 
+const { Student } = require(path.resolve(__dirname, './App/models/Student'));
+const { Lesson } = require(path.resolve(__dirname, './App/models/Lesson'));
+const { Assessment } = require(path.resolve(__dirname, './App/models/Assessment'));
+const { AssessmentQuestion } = require(path.resolve(__dirname, './App/models/Question'));
+const { ReviewQuestion } = require(path.resolve(__dirname, './App/models/Flashcard_Questions'));
+const { Review } = require(path.resolve(__dirname, './App/models/Flashcard_Review'));
+const { StudentAssessment } = require(path.resolve(__dirname, './App/models/StudentAssessment'));
+const { StudentReview } = require(path.resolve(__dirname, './App/models/Student_Review'));
+const { Topic } = require(path.resolve(__dirname, './App/models/Topic'));
+const userRouter = require(path.resolve(__dirname, './App/routes/userRoutes'));
+const topicRouter = require(path.resolve(__dirname, './App/routes/topicRoutes'));
+const setupAssociations = require(path.resolve(__dirname, './App/models/Associations'));
+const lessonRouter = require(path.resolve(__dirname, './App/routes/lessonRoutes'));
+const reviewRouter = require(path.resolve(__dirname, './App/routes/reviewRoutes'));
+const assRouter = require(path.resolve(__dirname, './App/routes/assessmentRoutes'));
+const simRouter = require(path.resolve(__dirname, './App/routes/simulationRoutes'));
+
+const PORT = process.env.PORT || 3000
+const app = express();
+
 var corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "https://revassist.site",
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    credentials: true,  
 };
 
+// Middleware
 app.use((req, res, next) => {
-    console.log(`${req.method} request to ${req.url}`);
+    const startTime = Date.now()
+    console.log(`${req.method} ${req.originalUrl}`);
+
+    const originalSend = res.send;
+    res.send = function (body) {
+        console.log(`Outgoing Response:`);
+        console.log(`- Status Code: ${res.statusCode}`);
+        console.log(`- Headers: ${JSON.stringify(res.getHeaders(), null, 2)}`);
+        console.log(`- Body: ${body}`);
+
+        originalSend.call(this, body); 
+    };
+
+    res.on('finish', () => {
+        const duration = Date.now() - startTime;
+        console.log(`Request completed in ${duration}ms`);
+    });
     next();
 });
 
+
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-//app.use(express.static("build"))
-
-app.get('/', (req, res) => {
-    res.status(200).send("Welcome to the root URL of Server");
-});
-
+// API Routes
 app.use('/api/users', userRouter);
 app.use('/api/topics', topicRouter);
 app.use('/api/lessons', lessonRouter);
@@ -55,7 +67,19 @@ app.use('/api/review', reviewRouter);
 app.use('/api/assessment', assRouter);
 app.use('/api/simulations', simRouter);
 
-require('./App/models/Associations'); 
+app.use(express.static(path.join(__dirname, "build")));
+
+app.use('/api/*', (req, res) => {
+    res.status(404).json({ error: 'API route not found' });
+});
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+  
+
+require(path.resolve(__dirname, './App/models/Associations'));
 
 const models = {
     Topic,
@@ -66,35 +90,13 @@ const models = {
     StudentAssessment,
     StudentReview,
     AssessmentQuestion,
-    ReviewQuestion
+    ReviewQuestion,
 };
 
 setupAssociations(models);
 
 const startServer = async () => {
     try {
-        await initializeDatabase();
-        
-        await createStudentTable();
-        await createTopicTable();
-        await createLessonsTable();
-        
-        await createAssessmentsTable();
-        await createReviewTable();
-        
-        await createAssessmentQuestionsTable();
-        await createReviewQuestionsTable();
-        await createStudentAssessmentsTable();
-        await createStudentReviewTable();
-
-        await createSimulationsTable();
-        await createStudentSimulationTable();
-        await createSimulationDialogueTable();
-
-        await createCorrectdialoguerepliesTable();
-        await createEndingdialogueTable();
-        await createReviewAnswersTable()
-        await createAssessmentAnswersTable();
 
         app.listen(PORT, (error) => {
             if (!error) {

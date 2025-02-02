@@ -1,7 +1,14 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../../config/dbconfig');
+const path = require('path');
+console.log('Resolved dbconfig Path:', path.resolve('./config/dbconfig'));
 
-const Student = sequelize.define('Student', {
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.resolve('./config/dbconfig')); 
+
+if (!sequelize) {
+  throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
+}
+
+const Student = sequelize.define('students', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -43,16 +50,6 @@ const Student = sequelize.define('Student', {
   },
 });
 
-const createStudentTable = async () => {
-  try {
-    await Student.sync();
-    console.log("Student table created or already exists.");
-  } catch (error) {
-    console.error("Error creating Student table:", error);
-  }
-};
-
 module.exports = {
   Student,
-  createStudentTable,
 };

@@ -1,10 +1,12 @@
+const path = require('path');
 const jwt = require('jsonwebtoken');
-const {Student} = require('../models/Student');
+const {Student} = require(path.resolve(__dirname,'../models/Student'));
 
 async function loginUser(req, res) {
     const { email, password } = req.body;
 
     try {
+        console.log("email: ", email, " password: ", password)
         const student = await Student.findOne({ where: { email } });
 
         if (!student || student.password !== password) {
@@ -32,6 +34,7 @@ async function loginUser(req, res) {
 
         res.json({ message: 'Login successful', token, studentId: student.id });
     } catch (error) {
+        console.log(error.message )
         res.status(500).json({ error: 'Login failed', details: error.message });
     }
 }
@@ -39,6 +42,7 @@ async function loginUser(req, res) {
 
 async function getUser(req, res) {
     const { studentId } = req.params;
+    console.log("getting student")
 
     try {
         const student = await Student.findOne({ where: { id: parseInt(studentId, 10) } });
@@ -48,7 +52,7 @@ async function getUser(req, res) {
         }
 
         const { email, fname, lname, frequency } = student;
-
+        console.log("found student")
         res.json({ message: 'Login successful', student: { email, fname, lname, frequency } });
     } catch (error) {
         res.status(500).json({ error: 'Login failed', details: error.message });

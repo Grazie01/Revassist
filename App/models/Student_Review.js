@@ -1,9 +1,18 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../../config/dbconfig');
-const { Review } = require('./Flashcard_Review');
-const { Student } = require('./Student');
+const path = require('path');
+console.log('Resolved dbconfig Path:', path.resolve('../../config/dbconfig'));
+console.log('Resolved Review Path:', path.resolve(__dirname, './Flashcard_Review'));
+console.log('Resolved Student Path:', path.resolve(__dirname, './Student'));
 
-const StudentReview = sequelize.define('StudentReview', {
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../config/dbconfig'); 
+
+if (!sequelize) {
+  throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
+}
+const { Review } = require(path.resolve(__dirname, './Flashcard_Review'));
+const { Student } = require(path.resolve(__dirname, './Student'));
+
+const StudentReview = sequelize.define('studentreview', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -41,16 +50,6 @@ const StudentReview = sequelize.define('StudentReview', {
   },
 });
 
-const createStudentReviewTable = async () => {
-  try {
-    await StudentReview.sync();
-    console.log("StudentReview table created or already exists.");
-  } catch (error) {
-    console.error("Error creating StudentReview table:", error);
-  }
-};
-
 module.exports = {
     StudentReview,
-    createStudentReviewTable,
 };

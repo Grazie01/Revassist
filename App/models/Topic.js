@@ -1,9 +1,14 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../../config/dbconfig'); // Import sequelize instance
-const { Lesson } = require('./Lesson');
-const { Assessment } = require('./Assessment');
+const path = require('path');
+console.log('Resolved dbconfig Path:', path.resolve('./config/dbconfig'));
 
-const Topic = sequelize.define('Topics', {
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.resolve('./config/dbconfig')); 
+
+if (!sequelize) {
+  throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
+}
+
+const Topic = sequelize.define('topics', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -15,16 +20,6 @@ const Topic = sequelize.define('Topics', {
   }
 });
 
-const createTopicTable = async () => {
-  try {
-    await Topic.sync();
-    console.log("Topic table created or already exists.");
-  } catch (error) {
-    console.error("Error creating Topic table:", error);
-  }
-};
-
 module.exports = {
   Topic,
-  createTopicTable,
 };

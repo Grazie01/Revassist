@@ -1,5 +1,6 @@
-const { Topic } = require('../models/Topic');
-const { Lesson } = require('../models/Lesson');
+const path = require('path');
+const { Topic } = require(path.resolve(__dirname,'../models/Topic'));
+const { Lesson } = require(path.resolve(__dirname,'../models/Lesson'));
 
 async function getAllTopics(req, res) {
   try {

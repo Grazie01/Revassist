@@ -1,9 +1,16 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../../config/dbconfig');
-const { Lesson } = require('./Lesson');
-const { ReviewQuestion } = require('./Flashcard_Questions');
+const path = require('path');
+console.log('Resolved dbconfig Path:', path.resolve('../../config/dbconfig'));
+console.log('Resolved Lesson Path:', path.resolve(__dirname, './Lesson'));
 
-const Review = sequelize.define('Review', {
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../config/dbconfig'); 
+
+if (!sequelize) {
+  throw new Error('Sequelize instance is not initialized. Check your dbconfig.js setup.');
+}
+const { Lesson } = require(path.resolve(__dirname, './Lesson'));
+
+const Review = sequelize.define('review', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -24,16 +31,7 @@ const Review = sequelize.define('Review', {
   },
 });
 
-const createReviewTable = async () => {
-  try {
-    await Review.sync();
-    console.log("Review table created or already exists.");
-  } catch (error) {
-    console.error("Error creating Review table:", error);
-  }
-};
 
 module.exports = {
     Review,
-    createReviewTable,
 };

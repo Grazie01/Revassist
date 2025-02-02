@@ -1,4 +1,5 @@
-const { Lesson } = require("../models/Lesson");
+const path = require('path');
+const { Lesson } = require(path.resolve(__dirname,"../models/Lesson"));
 const { YoutubeTranscript } = require("youtube-transcript")
 
 async function getLesson(req, res) { 
@@ -29,11 +30,12 @@ async function getVideo(req, res) {
     console.log("GET request to /get-video with ID:", videoId);
   
     try {
-      const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-  
-      if (!transcript) {
-        return res.status(404).json({ error: "Transcript not available for this video" });
+      if (!videoId || typeof videoId !== 'string') {
+          return res.status(400).json({ error: "Invalid video ID" });
       }
+      const transcript = await YoutubeTranscript.fetchTranscript(videoId, {
+        languages: ["en", "auto"],
+      });
   
       res.json({ transcript });
     } catch (error) {
